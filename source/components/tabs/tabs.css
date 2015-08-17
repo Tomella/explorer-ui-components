@@ -1,0 +1,90 @@
+.tabs-main {
+	position: absolute;
+	top: 0px;
+	bottom:0px;
+	padding-top: 8px;
+	right: 0px;
+	background: #FFF;
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	-o-user-select: none;
+	user-select: none;
+}
+
+#tabs-container {
+	position: absolute;
+    width: 9999px;
+	z-index: inherit;
+	/* keeps ie happy for mousemove events */ 
+	background: rgba(255, 255, 255, 0); 
+}
+
+.rotate-tabs {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 100%;
+    -webkit-transform: rotate(-90deg);
+    -moz-transform: rotate(-90deg);
+    -o-transform: rotate(-90deg);
+    -ms-transform: rotate(-90deg);
+    -sand-transform: rotate(90deg);
+    transform-origin: bottom right; 
+    -webkit-transform-origin: bottom right; 
+    -ms-transform-origin: bottom right;  
+    display: block;
+}
+
+.tab-item {
+	float: right;
+	padding: 5px 15px 0px 15px;
+	border: 1px solid #999;
+	background: #FFF;
+	cursor: pointer;
+	height: 30px;
+}
+
+#tabs-content-container {
+	width: 550px;
+	right:0;
+	top:0;
+	bottom:0;
+	position: absolute;
+	z-index: inherit;
+}
+
+#tabs-content-container .tab-content-item {
+	background: #FFF;	
+	height: 100%;
+	overflow-y:auto;
+	overflow-x:hidden;
+}
+
+
+.x-resize {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  width: 4px;
+  bottom:0px;
+  cursor: e-resize; 
+  background: #CCC;
+  z-index: 1;
+}
+
+/* bg-splitter override look & feel */
+
+.split-panes.vertical > .split-handler
+{
+  background: #CCC !important;
+  border: none !important;
+}
+
+.split-panes.vertical > .split-handler:hover, .h-resize:hover {
+	background: #999 !important;
+}
+
+.split-panes {
+	background: #FFF;
+}

@@ -1,0 +1,14 @@
+<div class="exp-modal-outer">
+	<div class="exp-backdrop fade  in" ng-show="isModal && isOpen" 
+		ng-class="{in: animate}"></div>
+	<div class="exp-modal" ng-show="isOpen" exp-modal-up>
+		<div class="exp-modal-inner">
+    	  <div drag-parent parentClass="exp-modal-outer" class="exp-modal-title" ng-show="title">
+      		<i class="fa" ng-class="iconClass"></i> 
+      		<span ng-bind="title"></span>
+      		<button title="Close popup dialog" ng-click="isOpen=false" class="exp-modal-close" type="button"><i class="fa fa-close"></i></button> 
+	      </div>      
+    	  <div class="exp-modal-content" style="{{containerStyle}}" ng-class="{'exp-modal-no-title':!title}" ng-transclude></div>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,79 @@
+<div ng-form>
+	<div ng-repeat="map in maps | orderBy : 'name'" style="padding:7px;padding-left:10px;position:relative;height:1.4em" ng-class-even="'even'" ng-class-odd="'active'">
+		<div style="float:left">
+			<a href="javascript:;" class="featureLink" ng-click="makeActive()" ng-class="{active:(map == active)}" >
+				{{map.name}} 
+			</a>
+		</div>
+		<div style="float:right">
+			<a class="featureLink" href="javascript:;" title="Show legend for this map" ng-show="map.legendUrl" heading="map.name + ' Legend'"
+				explorer-legend legend="map.legendUrl"><i class="fa fa-list-ul"></i></a>
+			<a class="featureLink" href="javascript:;" title="Edit the map" 
+				ng-click="editMap()"><i class="fa fa-pencil"></i></a>	
+			<a class="featureLink" href="javascript:;" title="Show on map" 
+				ng-click="toggleShow()"><i class="fa" ng-class="{'fa-eye':(!map.layer.visibility), 'fa-eye-slash':map.layer.visibility}"></i></a>	
+			<a href="javascript:" exp-confirm="'Are you sure that you want to delete this map?'" success="removeMap()" title="Remove map from application. Cannot be undone.">
+				<i class="fa fa-remove" title="Remove this feature from your added maps."></i>
+			</a>						
+		</div>
+	</div>
+	<vectors-display vectors="vectors"></vectors-display>
+	
+	<accordion>
+		<accordion-group heading="{{status.edit && 'Edit' || 'Add'}} a map..." is-open="status.mapOpen">
+			<div class="addMapsDialog">
+				<div>
+					<label for="addMapsName">Name</label>
+					<input type="text" ng-model="work.name" id="addMapsName" required="required"/>
+				</div>
+				<div>
+					<label for="addMapsDescription">Description</label>
+					<input type="text" ng-model="work.description" id="addMapsDescription"/>
+				</div>
+				<div>
+					<label for="addMapsUrl">WMS URL</label>
+					<input type="text" ng-model="work.url" id="addMapsUrl" required="required"/>
+				</div>
+				<div>
+					<label for="addMapsLayers">Layers</label>
+					<div ng-repeat="layer in work.layers | reverse" ng-class-even="'even'" ng-class-odd="'active'">
+						<div style="padding:2px">
+							{{layer}}
+							<div style="float:right">
+								<a class="featureLink" href="javascript:;" title="Move layer higher on map" ng-disabled="$first"
+									ng-click="shuffleDown()"><i class="fa fa-arrow-up"></i></a>	
+								<a class="featureLink" href="javascript:;" title="Move layer lower on map" ng-disabled="$last"
+									ng-click="shuffleUp()"><i class="fa fa-arrow-down"></i></a>	
+								<a href="javascript:" exp-confirm="'Are you sure that you want to delete this map?'" success="removeLayer()" title="Remove map from application.">
+									<i class="fa fa-remove" title="Remove this layer from your added maps."></i>
+								</a>						
+							</div>
+						</div>
+					</div>
+					<input ng-model="workLayer" ng-required="work.layers.length == 0" 
+							exp-enter="addLayer()" title="Hit enter after entering each layer to add the layer"/>
+					<button ng-click="addLayer()" title="You can also use the enter key to add layer from the previous input">Add</button>
+				</div>
+				<div>
+					<label for="addMapsThumbnailUrl">Thumbnail URL</label>
+					<input type="text" ng-model="work.thumbnailUrl"/>
+				</div>
+				<div>
+					<label for="addMapsLegendUrl">Legend URL</label>
+					<input type="text" ng-model="work.legendUrl"/>
+				</div>
+			</div>
+	
+			<div class="addMapButtons">
+				<div  class="buttons" style="float:right">
+					<button type="button" class="btn btn-default" ng-click="clear()" title="Abandon updates">Cancel</button>
+					<button type="button" class="btn btn-default" ng-click="addMap($event)" ng-disabled="!isComplete()" 
+								title="Click to complete updates">{{status.edit && 'Update' || 'Add'}}</button>
+				</div>
+			</div>
+		</accordion-group>
+		<accordion-group heading="{{status.vectorEdit && 'Edit' || 'Add'}} a vector..." is-open="status.vectorOpen">
+			<div mars-vector-edit vectors="vectors">
+		</accordion-group>
+	</accordion>
+</div>

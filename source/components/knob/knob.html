@@ -1,0 +1,22 @@
+<input class="preset1" type="range" tabindex="-1" style="position: absolute; top: -10000px;" knob-handler>
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg"  width="100%" height="100%" class="knob" viewbox="0 0 200 200" ng-attr-style="{{checkDisabled()}}">
+	<defs>
+   		<filter id="{{knobShadow}}" height="150%" width="150%">
+       		<feGaussianBlur in="SourceAlpha" stdDeviation="2"/>
+   	    	<feOffset dx="0" dy="3" result="offsetblur"/>
+        	<feMerge>
+	   	        <feMergeNode/>
+    	   	    <feMergeNode in="SourceGraphic"/>
+	       	</feMerge>
+	   	</filter>
+	</defs>
+	<circle cx="100" cy="100" r="60.606061" ng-attr-style="filter:url(#{{knobShadow}});fill:{{config.circleColor}}"></circle>
+	<rect x="97" y="39.4" width="6" height="40" class=" pointer" ng-attr-transform="rotate({{angle}} 100 100)" ng-attr-fill={{config.pointerColor}}></rect>
+	<g class=" scale">
+		<text ng-repeat="tick in ticks" x="95" y="23.8" width="10" height="10" 
+				ng-attr-transform="rotate({{config.startAngle + $index * config.degrees + 3}} 100 100)" style="text-anchor:middle">{{tick}}</text>
+	</g>
+	<g>
+		<text y="175" dy=".71em" x="100" style="text-anchor:middle; font-weight:bold">{{config.label}}</text>
+	</g>
+</svg>

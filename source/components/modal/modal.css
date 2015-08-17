@@ -1,0 +1,66 @@
+.exp-modal {
+  z-index: 1041;
+  padding: 1px;
+  text-align: left;
+  white-space: normal;
+  background-color: white;
+  background-clip: padding-box;
+  border: 1px solid #ccc;
+  border: 1px solid rgba(0, 0, 0, .2);
+  border-radius: 6px;
+  -webkit-box-shadow: 0 5px 10px rgba(0, 0, 0, .2);
+          box-shadow: 0 5px 10px rgba(0, 0, 0, .2);
+}
+
+.exp-modal-outer {
+	z-index:1040;
+}
+
+
+.exp-modal-title {
+  padding: 4px 6px;
+  margin: 0;
+  font-size: 14px;
+  font-weight: normal;
+  line-height: 18px;
+  background-color: #eeeeee;
+  border-bottom: 1px solid #ebebeb;
+  border-radius: 5px 5px 0 0;
+}
+
+.exp-modal-close {
+	float:right;
+	border:none;
+	outline:none;
+	padding-right:2px;
+}
+
+.exp-modal-content {
+  padding: 9px 14px;
+}
+
+.exp-modal.ng-hide-add, .exp-modal.ng-hide-remove {
+  /* this is required as of 1.3x to properly
+     apply all styling in a show/hide animation */
+  transition:0s linear all;
+}
+
+.exp-modal.ng-hide-add-active,
+.exp-modal.ng-hide-remove-active {
+  /* the transition is defined in the active class */
+  transition:1s linear all;
+}
+
+.exp-backdrop {
+    background-color: #000;
+    bottom: 0;
+    left: 0;
+    position: fixed;
+    right: 0;
+    top: 0;
+    z-index: -1;
+}
+
+.exp-backdrop.in {
+    opacity: 0.6;
+}

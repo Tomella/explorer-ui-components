@@ -1,0 +1,41 @@
+.marsinfo {
+  z-index: 1010;
+  padding: 1px;
+  text-align: left;
+  white-space: normal;
+  opacity: 1;
+  background-color: #F4FABE;
+  background-clip: padding-box;
+  border: 1px solid #ccc;
+  border: 1px solid rgba(0, 0, 0, .2);
+  border-radius: 6px;
+  -webkit-box-shadow: 0 5px 10px rgba(0, 0, 0, .2);
+          box-shadow: 0 5px 10px rgba(0, 0, 0, .2);
+}
+
+.marsinfo-title {
+  padding: 8px 14px;
+  margin: 0;
+  font-size: 14px;
+  font-weight: normal;
+  line-height: 18px;
+  background-color: #FAF29D;
+  border-bottom: 1px solid #ebebeb;
+  border-radius: 5px 5px 0 0;
+}
+
+.marsinfo-content {
+  padding: 9px 14px;
+}
+
+.marsinfo.ng-hide-add, .marsinfo.ng-hide-remove {
+  /* this is required as of 1.3x to properly
+     apply all styling in a show/hide animation */
+  transition:0s linear all;
+}
+
+.marsinfo.ng-hide-add-active,
+.marsinfo.ng-hide-remove-active {
+  /* the transition is defined in the active class */
+  transition:1s linear all;
+}

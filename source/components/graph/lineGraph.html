@@ -1,0 +1,39 @@
+<div class="lineGraphContainer" style="width:100%; position:relative">
+	<img src="resources/img/aspect_10x1.png" style="width:100%;" class="aspect10x1"></img>
+	<div style="position: absolute;	top: 0px; left: 0px; height: 100%;width:100%" >
+		<svg class="lineGraphSvg" preserveAspectRatio="xMinYMin meet" xmlns="http://www.w3.org/2000/svg" version="1.1" width="100%" height="100%" viewBox="0 0 1050 105" 
+					ng-mouseenter="mouseEnter($event)" ng-mouseleave="mouseLeave($event)" ng-mousemove="mouseMove($event)" ng-click="mouseClick($event)">
+			<g>
+				<text y="16" x="57" style="fill-opacity:0.6; font-size:120%">{{config.heading}}</text>
+			</g>
+  			<g transform="translate(0, 2)">
+  				<g class="zeroLine" ng-show="showZeroLine && minY < 0">
+					<line x1="50" ng-attr-y1="{{90 * (1 + minY/rangeY)}}" x2="1050" ng-attr-y2="{{90 * (1 + minY/rangeY)}}" style="stroke:blue" stroke-width="1" stroke-opacity="0.6" />
+				</g>
+  				<g ng-repeat="points in data" class="context" style="cursor:pointer" transform="translate(50)" explorer-line>
+					<path ng-attr-fill="{{points.style.fill}}" class="area" ng-attr-d="{{path}}" ng-attr-fill-opacity="{{points.style.fillOpacity}}"></path>
+					<path ng-attr-d="{{line}}" ng-attr-stroke="{{points.style.stroke}}" ng-attr-stroke-width="{{points.style.strokeWidth}}" fill-opacity="0"></path> 
+				</g>
+  				<g class="xAxis">
+					<line x1="50" y1="90" x2="1050" y2="90" style="stroke:black" />
+					<text transform="translate(1040 88)" y="4" dy=".71em" style="text-anchor:end">{{config.xLabel}}</text>
+				</g>
+				<g class="yAxis">
+					<line x1="50" y1="0" x2="50" y2="90" style="stroke:black" />
+					<text transform="rotate(-90) translate(-10)" y="6" dy=".71em" style="text-anchor:end">{{config.yLabel}}</text>
+					<g ng-repeat="tick in yTicks">
+						<text font-size="80%" style="text-anchor:end;" ng-attr-transform="translate(45 {{90 * (1 - (tick - minY)/ rangeY) +3}})">{{round(tick)}}</text>
+						<line x1="45" x2="50" ng-attr-y1="{{90 * (1 - (tick - minY)/ rangeY)}}" ng-attr-y2="{{90 * (1 - (tick - minY)/ rangeY)}}" style="stroke:black"></line>
+					</g>
+				</g>
+				<g visibility="visible" ng-show="position">
+					<line x1="{{50 + position.graphX}}" y1="-5" x2="{{50 + position.graphX}}" y2="95" style="stroke:black" />
+  				</g>
+  			</g>
+  			<g transform="translate(0 88)">
+				<text y="6" dy=".71em" transform="translate(50)">{{config.leftText}}</text>
+				<text y="6" dy=".71em" transform="translate(250)">{{config.middleText}}</text>
+  			</g>
+		</svg>
+	</div>
+</div>
