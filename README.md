@@ -5,4 +5,4 @@ Explore UI components are those that give functionality to the explorer suite of
 * Clone the repository
 * Ensure you have both node.js and npm installed
 * Install gulp globally >npm gulp -g
-* Run gulp >node gulp.js
+* Run gulp >gulp
