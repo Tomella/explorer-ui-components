@@ -12,7 +12,7 @@ angular.module("graph", [])
 	HEIGHT = 90;
 
 	return {
-		templateUrl : "components/graph/lineGraph.html?v=1",
+		templateUrl : "components/graph/lineGraph.html",
 		scope:{
 			data : "=",
 			config : "=",

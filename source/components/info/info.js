@@ -16,7 +16,7 @@ angular.module("explorer.info", [])
 	    	title: '@',  
 	    	isOpen: '='
 	    },
-	    templateUrl: 'components/info/info.html?v=1',
+	    templateUrl: 'components/info/info.html',
 	    link: function( scope, element ) {
     		function keyupHandler(keyEvent) {
     			if(keyEvent.which == 27) {

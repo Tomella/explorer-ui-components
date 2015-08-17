@@ -117,7 +117,6 @@ angular.module("explorer.broker", [])
 /*!
  * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
  */
-
 (function(angular) {
 	
 
@@ -859,7 +858,7 @@ angular.module("graph", [])
 	HEIGHT = 90;
 
 	return {
-		templateUrl : "components/graph/lineGraph.html?v=1",
+		templateUrl : "components/graph/lineGraph.html",
 		scope:{
 			data : "=",
 			config : "=",
@@ -1091,52 +1090,38 @@ angular.module("graph", [])
 
 'use strict';
 
-angular.module('explorer.header', [])
+angular.module("explorer.httpdata", [])
 
-.controller('headerController', [ '$scope', '$q', '$timeout', function ($scope, $q, $timeout) {
-
-    var modifyConfigSource = function (headerConfig) {
-        return headerConfig;
-    };
-
-    $scope.$on('headerUpdated', function (event, args) {
-        $scope.headerConfig = modifyConfigSource(args);
-    });
-}])
-
-.directive('explorerHeader', [function() {
-	var defaults = {
-		heading:"Geoscience Australia",
-		headingtitle:"Geoscience Australia",
-		helpurl:"help.html",
-		helptitle:"Get help about Geoscience Australia",
-		helpalttext:"Get help about Geoscience Australia",
-		skiptocontenttitle:"Skip to content",
-		skiptocontent:"Skip to content",
-		quicklinksurl:"/search/api/quickLinks/json?lang=en-US"
-	};
+.factory('httpData', ['$http', '$q', function($http, $q){
+	// Just a convenience wrapper around $http
 	return {
-		transclude:true,
-		restrict:'EA',
-		templateUrl:"components/header/header.html?v=1",
-		scope : {
-			heading: "=",
-			headingtitle:"=",
-			helpurl:"=",
-			helptitle:"=",
-			helpalttext:"=",
-			skiptocontenttitle:"=",
-			skiptocontent:"=",
-			quicklinksurl:"="
+		get : function(url, options) {
+			return this._method("get", url, options);
 		},
-		link:function(scope, element, attrs) {
-			var data = angular.copy(defaults);
-			angular.forEach(defaults, function(value, key) {
-				if(!(key in scope)) {
-					scope[key] = value;
+		
+		post : function(url, options) {
+			return this._method("post", url, options);
+		},
+		
+		put : function(url, options) {
+			return this._method("put", url, options);
+		},
+		
+		_method : function(method, url, options) {
+			var deferred = $q.defer();
+			$http[method](url, options).then(function(response){
+					if(!response) {
+						deferred.resolve(null);
+					} else {
+						deferred.resolve(response.data);
+					}
+				},
+				function(err) {
+					deferred.reject(err);
 				}
-			});
-		}
+			);
+			return deferred.promise;			
+		}		
 	};
 }]);
 
@@ -1183,38 +1168,52 @@ angular.module("explorer.height.delta", [])
 
 'use strict';
 
-angular.module("explorer.httpdata", [])
+angular.module('explorer.header', [])
 
-.factory('httpData', ['$http', '$q', function($http, $q){
-	// Just a convenience wrapper around $http
+.controller('headerController', [ '$scope', '$q', '$timeout', function ($scope, $q, $timeout) {
+
+    var modifyConfigSource = function (headerConfig) {
+        return headerConfig;
+    };
+
+    $scope.$on('headerUpdated', function (event, args) {
+        $scope.headerConfig = modifyConfigSource(args);
+    });
+}])
+
+.directive('explorerHeader', [function() {
+	var defaults = {
+		heading:"Geoscience Australia",
+		headingtitle:"Geoscience Australia",
+		helpurl:"help.html",
+		helptitle:"Get help about Geoscience Australia",
+		helpalttext:"Get help about Geoscience Australia",
+		skiptocontenttitle:"Skip to content",
+		skiptocontent:"Skip to content",
+		quicklinksurl:"/search/api/quickLinks/json?lang=en-US"
+	};
 	return {
-		get : function(url, options) {
-			return this._method("get", url, options);
+		transclude:true,
+		restrict:'EA',
+		templateUrl:"components/header/header.html",
+		scope : {
+			heading: "=",
+			headingtitle:"=",
+			helpurl:"=",
+			helptitle:"=",
+			helpalttext:"=",
+			skiptocontenttitle:"=",
+			skiptocontent:"=",
+			quicklinksurl:"="
 		},
-		
-		post : function(url, options) {
-			return this._method("post", url, options);
-		},
-		
-		put : function(url, options) {
-			return this._method("put", url, options);
-		},
-		
-		_method : function(method, url, options) {
-			var deferred = $q.defer();
-			$http[method](url, options).then(function(response){
-					if(!response) {
-						deferred.resolve(null);
-					} else {
-						deferred.resolve(response.data);
-					}
-				},
-				function(err) {
-					deferred.reject(err);
+		link:function(scope, element, attrs) {
+			var data = angular.copy(defaults);
+			angular.forEach(defaults, function(value, key) {
+				if(!(key in scope)) {
+					scope[key] = value;
 				}
-			);
-			return deferred.promise;			
-		}		
+			});
+		}
 	};
 }]);
 
@@ -1318,7 +1317,7 @@ angular.module("explorer.info", [])
 	    	title: '@',  
 	    	isOpen: '='
 	    },
-	    templateUrl: 'components/info/info.html?v=1',
+	    templateUrl: 'components/info/info.html',
 	    link: function( scope, element ) {
     		function keyupHandler(keyEvent) {
     			if(keyEvent.which == 27) {
@@ -1342,6 +1341,170 @@ angular.module("explorer.info", [])
 	    	});
 	    }
 	};
+}]);
+
+})(angular);
+/*!
+ * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
+ */
+(function(angular) { 
+
+'use strict'; 
+
+angular.module("explorer.legend", [])
+
+.directive("explorerLegend", ['$modal', function($modal){
+	return {
+		scope : {
+			legend : "=",
+			heading:"=?"
+		},
+		controller : ['$scope', function($scope) {
+			if(!$scope.heading) {
+				$scope.heading = "Legend";
+			}
+			$scope.showing = false;
+		}],
+		link : function(scope, element) {
+			var modalInstance;
+			element.on('click', function() {
+				if(scope.showing) {
+					modalInstance.close(null);
+					return;
+				}
+				modalInstance = $modal.open({
+					templateUrl: 'components/legend/legend.html',
+					windowClass: 'legendContainer',
+					size:'sm',
+					controller : ['$scope', '$modalInstance', 'legend', 'heading', function($scope, $modalInstance, legend, heading) {
+						$scope.legend = legend;
+						$scope.heading = heading;
+					}],
+					backdrop:false,
+					resolve: {
+						legend: function () {
+							return scope.legend;
+						},
+						heading : function() {
+							return scope.heading;
+						}
+					}
+				});
+				modalInstance.result.then(function() {scope.showing = false;}, function() {scope.showing = false;});
+				scope.showing = true;
+			});
+		}
+	};
+}]);
+
+})(angular);
+/*!
+ * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
+ */
+(function(angular) {
+
+'use strict';
+
+angular.module("explorer.message", [])
+
+.directive('explorerMessages', ['messageService', function(messageService) {
+	return {
+		restrict:'AE',
+		controller : 'MessageController',
+		templateUrl : 'components/message/messages.html',
+		link : function(scope, element, attrs, controller) {
+		}
+	};	
+}])
+
+.factory("messageService", ["$rootScope", function($rootScope) {
+    return {
+    	warn : function(message) {
+    		this._message("warn", message);
+    	},
+    	success : function(message) {
+    		this._message("success", message);
+    	},
+    	info : function(message) {
+    		this._message("info", message);
+    	},
+    	error : function(message) {
+    		this._message("error", message);
+    	},
+    	clear : function() {
+    		$rootScope.$broadcast('message.clear');
+    	},    	
+    	_message : function(type, message) {
+    		$rootScope.$broadcast('message.posted', {
+    			type : type,
+    			text : message,
+    			time : new Date()
+    		});
+    	}
+    };
+}])
+
+.controller('MessageController', ['$scope', '$timeout', '$rootScope', function($scope, $timeout, $rootScope) {
+	$scope.controller = "MessageController";
+	$scope.persistDuration = 12000;
+	$scope.historicCount = 10;
+	$scope.message = null;
+	$scope.historic = [];
+	
+	$rootScope.$on('message.posted', function(event, message) {
+		var phase = $scope.$root.$$phase;
+		if(phase == '$apply' || phase == '$digest') {
+			$scope.message = message;
+		} else {
+		   this.$apply(function() {
+				$scope.message = message;
+			});
+		}
+		
+		$timeout.cancel($scope.timeout);
+		$scope.timeout = $timeout(function() {
+			$scope.$apply(function() {
+				$scope.removeMessage();
+			});
+		}, $scope.persistDuration);
+	});
+	
+	$rootScope.$on("message.cleared", $scope.removeMessage);
+	
+	$scope.removeMessage = function() {
+		$scope.timeout = null;
+		$scope.historic.splice(0, 1, $scope.message);
+		while($scope.historic.length > 10) {
+			$scope.historic.pop();
+		}
+		$scope.message = null;
+	};	
+}])
+
+.run(['$rootScope', 'messageService',  
+         function($rootScope, messageService) {
+	//make current message accessible to root scope and therefore all scopes
+    $rootScope.$on("message:info", function (event, message) {
+        messageService.info(message);
+    });
+    $rootScope.$on("message:error", function (event, message) {
+        messageService.error(message);
+    });
+    $rootScope.$on("message:success", function (event, message) {
+        messageService.success(message);
+    });
+    $rootScope.$on("message:warn", function (event, message) {
+        messageService.warn(message);
+    });
+    $rootScope.$on("message:clear", function (message) {
+        messageService.warn(message);
+    });
+    $rootScope.$on("messages", function (event, messages) {
+    	messages = messages?angular.isArray(messages)?messages:[messages]:[];
+    	angular.forEach(messages, function(message) {
+    		$rootScope.$broadcast("message:" + message.type.toLowerCase(), message.text);
+    	}); 
+    });
 }]);
 
 })(angular);
@@ -1523,170 +1686,6 @@ angular.module("knob", [])
 			}
 		}
 	};
-}]);
-
-})(angular);
-/*!
- * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
- */
-(function(angular) { 
-
-'use strict'; 
-
-angular.module("explorer.legend", [])
-
-.directive("explorerLegend", ['$modal', function($modal){
-	return {
-		scope : {
-			legend : "=",
-			heading:"=?"
-		},
-		controller : ['$scope', function($scope) {
-			if(!$scope.heading) {
-				$scope.heading = "Legend";
-			}
-			$scope.showing = false;
-		}],
-		link : function(scope, element) {
-			var modalInstance;
-			element.on('click', function() {
-				if(scope.showing) {
-					modalInstance.close(null);
-					return;
-				}
-				modalInstance = $modal.open({
-					templateUrl: 'components/legend/legend.html',
-					windowClass: 'legendContainer',
-					size:'sm',
-					controller : ['$scope', '$modalInstance', 'legend', 'heading', function($scope, $modalInstance, legend, heading) {
-						$scope.legend = legend;
-						$scope.heading = heading;
-					}],
-					backdrop:false,
-					resolve: {
-						legend: function () {
-							return scope.legend;
-						},
-						heading : function() {
-							return scope.heading;
-						}
-					}
-				});
-				modalInstance.result.then(function() {scope.showing = false;}, function() {scope.showing = false;});
-				scope.showing = true;
-			});
-		}
-	};
-}]);
-
-})(angular);
-/*!
- * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
- */
-(function(angular) {
-
-'use strict';
-
-angular.module("explorer.message", [])
-
-.directive('explorerMessages', ['messageService', function(messageService) {
-	return {
-		restrict:'AE',
-		controller : 'MessageController',
-		templateUrl : 'components/message/messages.html?v=1',
-		link : function(scope, element, attrs, controller) {
-		}
-	};	
-}])
-
-.factory("messageService", ["$rootScope", function($rootScope) {
-    return {
-    	warn : function(message) {
-    		this._message("warn", message);
-    	},
-    	success : function(message) {
-    		this._message("success", message);
-    	},
-    	info : function(message) {
-    		this._message("info", message);
-    	},
-    	error : function(message) {
-    		this._message("error", message);
-    	},
-    	clear : function() {
-    		$rootScope.$broadcast('message.clear');
-    	},    	
-    	_message : function(type, message) {
-    		$rootScope.$broadcast('message.posted', {
-    			type : type,
-    			text : message,
-    			time : new Date()
-    		});
-    	}
-    };
-}])
-
-.controller('MessageController', ['$scope', '$timeout', '$rootScope', function($scope, $timeout, $rootScope) {
-	$scope.controller = "MessageController";
-	$scope.persistDuration = 12000;
-	$scope.historicCount = 10;
-	$scope.message = null;
-	$scope.historic = [];
-	
-	$rootScope.$on('message.posted', function(event, message) {
-		var phase = $scope.$root.$$phase;
-		if(phase == '$apply' || phase == '$digest') {
-			$scope.message = message;
-		} else {
-		   this.$apply(function() {
-				$scope.message = message;
-			});
-		}
-		
-		$timeout.cancel($scope.timeout);
-		$scope.timeout = $timeout(function() {
-			$scope.$apply(function() {
-				$scope.removeMessage();
-			});
-		}, $scope.persistDuration);
-	});
-	
-	$rootScope.$on("message.cleared", $scope.removeMessage);
-	
-	$scope.removeMessage = function() {
-		$scope.timeout = null;
-		$scope.historic.splice(0, 1, $scope.message);
-		while($scope.historic.length > 10) {
-			$scope.historic.pop();
-		}
-		$scope.message = null;
-	};	
-}])
-
-.run(['$rootScope', 'messageService',  
-         function($rootScope, messageService) {
-	//make current message accessible to root scope and therefore all scopes
-    $rootScope.$on("message:info", function (event, message) {
-        messageService.info(message);
-    });
-    $rootScope.$on("message:error", function (event, message) {
-        messageService.error(message);
-    });
-    $rootScope.$on("message:success", function (event, message) {
-        messageService.success(message);
-    });
-    $rootScope.$on("message:warn", function (event, message) {
-        messageService.warn(message);
-    });
-    $rootScope.$on("message:clear", function (message) {
-        messageService.warn(message);
-    });
-    $rootScope.$on("messages", function (event, messages) {
-    	messages = messages?angular.isArray(messages)?messages:[messages]:[];
-    	angular.forEach(messages, function(message) {
-    		$rootScope.$broadcast("message:" + message.type.toLowerCase(), message.text);
-    	}); 
-    });
 }]);
 
 })(angular);
@@ -2076,6 +2075,50 @@ angular.module('mars.print', [])
 }]);
 
 })(angular, window);
+/**
+ * @ngdoc object
+ * @name explorer.resizelistener
+ * @description
+ * 
+ * <p>Binds to window resize event, exposes windowWidth and windowHeight as $scope vars.</p>
+ * 
+ * 
+ **/
+
+angular.module('explorer.resizelistener', [])
+
+.directive('resizeListener', function($window) {
+	
+	return function (scope, element) {
+        var w = angular.element($window);
+        scope.getWindowDimensions = function () {
+            return {
+                'h': w.height(),
+                'w': w.width()
+            };
+        };
+        
+        scope.$watch(scope.getWindowDimensions, function (newValue, oldValue) {
+            
+        	scope.windowHeight = newValue.h;
+            scope.windowWidth = newValue.w;
+
+            scope.style = function () {
+                return {
+                    'height': (newValue.h - 100) + 'px',
+                    'width': (newValue.w - 100) + 'px'
+                };
+            };
+            
+            // could also broadcast 'resize complete' event if needed..
+
+        }, true);
+
+        w.bind('resize', function () {
+            scope.$apply();
+        });
+    };
+});
 /*!
  * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
  */
@@ -2121,50 +2164,6 @@ angular.module("explorer.projects", [])
 
 
 })(angular);
-/**
- * @ngdoc object
- * @name explorer.resizelistener
- * @description
- * 
- * <p>Binds to window resize event, exposes windowWidth and windowHeight as $scope vars.</p>
- * 
- * 
- **/
-
-angular.module('explorer.resizelistener', [])
-
-.directive('resizeListener', function($window) {
-	
-	return function (scope, element) {
-        var w = angular.element($window);
-        scope.getWindowDimensions = function () {
-            return {
-                'h': w.height(),
-                'w': w.width()
-            };
-        };
-        
-        scope.$watch(scope.getWindowDimensions, function (newValue, oldValue) {
-            
-        	scope.windowHeight = newValue.h;
-            scope.windowWidth = newValue.w;
-
-            scope.style = function () {
-                return {
-                    'height': (newValue.h - 100) + 'px',
-                    'width': (newValue.w - 100) + 'px'
-                };
-            };
-            
-            // could also broadcast 'resize complete' event if needed..
-
-        }, true);
-
-        w.bind('resize', function () {
-            scope.$apply();
-        });
-    };
-});
 /*!
  * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
  */
@@ -2449,141 +2448,6 @@ angular.module('mars.splitter', [])
 }]);
 
 })($, angular);
-/*!
- * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
- */
-(function(angular) {
-
-'use strict';
-
-angular.module('explorer.switch', [])
-
-.directive('explorerSwitch', [function () {
-	return {
-		restrict: 'EA',
-		scope: {
-			disabled: '=',
-			onLabel: '@',
-			offLabel: '@',
-			knobLabel: '@',
-			model: '='    	  
-		},
-    
-		template: '<div role="radio" class="toggle-switch" ng-class="{ \'disabled\': disabled }">' +
-        	'<div class="toggle-switch-animate" ng-class="{\'switch-off\': !model, \'switch-on\': model}">' +
-        	'<span class="switch-left switch-text" ng-bind="onLabel"></span>' +
-        	'<span class="switch-label-text" ng-bind="knobLabel"></span>' +
-        	'<span class="switch-right switch-text" ng-bind="offLabel"></span>' +
-        	'</div>' +
-        	'</div>',
-        link: function(scope, element){
-        	if(!scope.onLabel) { 
-        		scope.onLabel = 'On'; 
-        	}
-        	if(!scope.offLabel) { 
-        		scope.offLabel = 'Off'; 
-        	}
-        	if(!scope.knobLabel) { 
-        		scope.knobLabel = '\u00a0'; 
-        	}
-        	if(!scope.disabled) { 
-        		scope.disabled = false; 
-        	}
-
-        	element.on('click', function() {
-        		scope.$apply(scope.toggle);
-        	});
-        	
-        	scope.toggle = function toggle() {
-        		if(!scope.disabled) {
-    				scope.model = !scope.model;
-    			}
-    		};
-    	}
-  	};
-}]);
-
-})(angular);
-/**
- * @ngdoc object
- * @name explorer.tabs.left
- * @description
- *
- * <p>Used to control the show/hide/resize of tabs.
- * Application specific implementation should be added via a supplementary module and directives.</p>
- * 
- * General panelling is provided by bgDirectives
- * 
- * <p>e.g. Rock Props uses:</p>
- * <ul>
- * <li>rocks/tabs/tabs.html (defines app specific tabs and their respective directives)</li>
- * <li>rocks/tabs/rocks-tabs.js (defines the core tabsMain directive/template, and supporting content)</li>
- * </ul>
- * <p>So to use:</p>
- * <ol>
- * <li>include explorer.tabs module and resources</li>
- * <li>include assets/bg-splitter/*</li>
- * <li>define custom tabs and directives -> app-dir/tabs/</li>
- * <li>add tabsMain directive to your index.html, right below mapMain</li>
- * </ol>
- * 
- * 
- */
-
-angular.module('explorer.tabs.left', [])
-
-.controller("tabsLeftController", ['$scope', '$document', function($scope, $document) {
-	
-	var minWidth = 400;
-	var winWidth = window.innerWidth || document.documentElement.clientWidth;
-	var widthPersist = 700; // use 0 width when inactive
-	
-	$scope.view = '';
-	
-	$scope.contentWidth = 0;
-	$scope.winHeight = window.innerHeight || document.documentElement.clientHeight;
-	//$scope.winHeight = 9999;
-	
-	$scope.setView = function(view){
-		
-		if($scope.view === view){
-			$scope.view = '';
-			widthPersist = $scope.contentWidth;
-			$scope.contentWidth = 0;
-		}
-		else {
-			$scope.view = view;
-			$scope.contentWidth = widthPersist;
-		}
-	};
-	
-	
-	$scope.catchResize = function(){
-	
-		$document.on("mousemove", mousemove);
-		$document.on("mouseup", mouseup);
-		
-        function mousemove($event) {
-        	$scope.doResize($event);
-        }
-        
-        function mouseup() {
-        	$document.off("mousemove", mousemove);
-        	$document.off("mouseup", mouseup);
-        }
-	};
-	
-	$scope.doResize = function($event){
-		
-		var width = $event.pageX + 2;
-		width = (width > minWidth) ? width : minWidth;
-		
-		$scope.contentWidth = width;
-		widthPersist = width;
-		$scope.$apply();
-	};
-	
-}]);
 /**
  * @ngdoc object
  * @name explorer.tabs
@@ -2673,6 +2537,86 @@ angular.module('explorer.tabs', [])
 }]);
 
 })(angular);
+/**
+ * @ngdoc object
+ * @name explorer.tabs.left
+ * @description
+ *
+ * <p>Used to control the show/hide/resize of tabs.
+ * Application specific implementation should be added via a supplementary module and directives.</p>
+ * 
+ * General panelling is provided by bgDirectives
+ * 
+ * <p>e.g. Rock Props uses:</p>
+ * <ul>
+ * <li>rocks/tabs/tabs.html (defines app specific tabs and their respective directives)</li>
+ * <li>rocks/tabs/rocks-tabs.js (defines the core tabsMain directive/template, and supporting content)</li>
+ * </ul>
+ * <p>So to use:</p>
+ * <ol>
+ * <li>include explorer.tabs module and resources</li>
+ * <li>include assets/bg-splitter/*</li>
+ * <li>define custom tabs and directives -> app-dir/tabs/</li>
+ * <li>add tabsMain directive to your index.html, right below mapMain</li>
+ * </ol>
+ * 
+ * 
+ */
+
+angular.module('explorer.tabs.left', [])
+
+.controller("tabsLeftController", ['$scope', '$document', function($scope, $document) {
+	
+	var minWidth = 400;
+	var winWidth = window.innerWidth || document.documentElement.clientWidth;
+	var widthPersist = 700; // use 0 width when inactive
+	
+	$scope.view = '';
+	
+	$scope.contentWidth = 0;
+	$scope.winHeight = window.innerHeight || document.documentElement.clientHeight;
+	//$scope.winHeight = 9999;
+	
+	$scope.setView = function(view){
+		
+		if($scope.view === view){
+			$scope.view = '';
+			widthPersist = $scope.contentWidth;
+			$scope.contentWidth = 0;
+		}
+		else {
+			$scope.view = view;
+			$scope.contentWidth = widthPersist;
+		}
+	};
+	
+	
+	$scope.catchResize = function(){
+	
+		$document.on("mousemove", mousemove);
+		$document.on("mouseup", mouseup);
+		
+        function mousemove($event) {
+        	$scope.doResize($event);
+        }
+        
+        function mouseup() {
+        	$document.off("mousemove", mousemove);
+        	$document.off("mouseup", mouseup);
+        }
+	};
+	
+	$scope.doResize = function($event){
+		
+		var width = $event.pageX + 2;
+		width = (width > minWidth) ? width : minWidth;
+		
+		$scope.contentWidth = width;
+		widthPersist = width;
+		$scope.$apply();
+	};
+	
+}]);
 /*!
  * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
  */
@@ -2802,46 +2746,6 @@ angular.module('explorer.toolbar', [])
 		}]
 	};
 }]);
-
-})(angular);
-/*!
- * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
- */
-(function(angular) {
-
-'use strict';
-
-angular.module("explorer.version", [])
-
-.directive('marsVersionDisplay', ['$http', 'versionService', function($http, versionService) {
-	/**
-	 * CIAP theme switcher. Retrieves and stores the current theme to the theme service. 
-	 */
-	return {
-		templateUrl:'components/version/versionDisplay.html',
-		link : function(scope) {
-			$http.get(versionService.url()).then(function(response) {
-				scope.version = response.data.version;
-			});
-		}
-	};	
-}])
-
-.provider("versionService", function VersionServiceProvider() {
-	var versionUrl = "service/appConfig/version";
-	
-	this.url = function(url) {
-		versionUrl = url;
-	};
-	
-	this.$get = function configServiceFactory() {
-		return {
-			url : function() {
-				return versionUrl;
-			}
-		};
-	};
-});
 
 })(angular);
 /*!
@@ -3250,7 +3154,7 @@ angular.module("explorer.vector", ['explorer.flasher', 'explorer.broker', 'explo
 
 .directive("vectorsDisplay", ['vectorService', function(vectorService) {
 	return {
-		templateUrl : "components/usermaps/vectorDisplay.html?v=1",
+		templateUrl : "components/usermaps/vectorDisplay.html",
 		restrict : "AE",
 		require: '^addMaps',
 		link : function(scope, element) {
@@ -3497,6 +3401,99 @@ angular.module("explorer.vector", ['explorer.flasher', 'explorer.broker', 'explo
 /*!
  * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
  */
+(function(angular) {
+
+'use strict';
+
+angular.module("explorer.version", [])
+
+.directive('marsVersionDisplay', ['$http', 'versionService', function($http, versionService) {
+	/**
+	 * CIAP theme switcher. Retrieves and stores the current theme to the theme service. 
+	 */
+	return {
+		templateUrl:'components/version/versionDisplay.html',
+		link : function(scope) {
+			$http.get(versionService.url()).then(function(response) {
+				scope.version = response.data.version;
+			});
+		}
+	};	
+}])
+
+.provider("versionService", function VersionServiceProvider() {
+	var versionUrl = "service/appConfig/version";
+	
+	this.url = function(url) {
+		versionUrl = url;
+	};
+	
+	this.$get = function configServiceFactory() {
+		return {
+			url : function() {
+				return versionUrl;
+			}
+		};
+	};
+});
+
+})(angular);
+/*!
+ * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
+ */
+(function(angular) {
+	
+
+'use strict';
+
+angular.module("explorer.waiting", [])
+
+.factory("waiting", ['$q', function($q) {
+	return {
+		wait : function() {
+			return new QAll();
+		}
+	};
+	
+	function QAll() {
+		this.waiting = [];
+		this.length = 0;
+		this.waiter = function() {
+			var deferred = $q.defer();
+			this.waiting.push(deferred);
+			this.length++;
+			
+			return deferred;
+		};
+		
+		this.resolve = function(result) {
+			this.waiting.forEach(function(promise) {
+				promise.resolve(result);
+			});
+			this.waiting = [];
+			this.length =0;
+		};
+		
+		this.reject = function(result) {
+			this.waiting.forEach(function(promise) {
+				promise.reject(result);
+			});
+			this.waiting = [];
+			this.length =0;
+		};
+		
+		this.notify = function(result) {
+			this.waiting.forEach(function(promise) {
+				promise.notify(result);
+			});
+		};
+	}
+}]);
+
+})(angular);
+/*!
+ * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
+ */
 (function(angular, OpenLayers) {
 
 'use strict';
@@ -3631,52 +3628,54 @@ angular.module("mars.zoom", [])
  * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
  */
 (function(angular) {
-	
 
 'use strict';
 
-angular.module("explorer.waiting", [])
+angular.module('explorer.switch', [])
 
-.factory("waiting", ['$q', function($q) {
+.directive('explorerSwitch', [function () {
 	return {
-		wait : function() {
-			return new QAll();
-		}
-	};
-	
-	function QAll() {
-		this.waiting = [];
-		this.length = 0;
-		this.waiter = function() {
-			var deferred = $q.defer();
-			this.waiting.push(deferred);
-			this.length++;
-			
-			return deferred;
-		};
-		
-		this.resolve = function(result) {
-			this.waiting.forEach(function(promise) {
-				promise.resolve(result);
-			});
-			this.waiting = [];
-			this.length =0;
-		};
-		
-		this.reject = function(result) {
-			this.waiting.forEach(function(promise) {
-				promise.reject(result);
-			});
-			this.waiting = [];
-			this.length =0;
-		};
-		
-		this.notify = function(result) {
-			this.waiting.forEach(function(promise) {
-				promise.notify(result);
-			});
-		};
-	}
+		restrict: 'EA',
+		scope: {
+			disabled: '=',
+			onLabel: '@',
+			offLabel: '@',
+			knobLabel: '@',
+			model: '='    	  
+		},
+    
+		template: '<div role="radio" class="toggle-switch" ng-class="{ \'disabled\': disabled }">' +
+        	'<div class="toggle-switch-animate" ng-class="{\'switch-off\': !model, \'switch-on\': model}">' +
+        	'<span class="switch-left switch-text" ng-bind="onLabel"></span>' +
+        	'<span class="switch-label-text" ng-bind="knobLabel"></span>' +
+        	'<span class="switch-right switch-text" ng-bind="offLabel"></span>' +
+        	'</div>' +
+        	'</div>',
+        link: function(scope, element){
+        	if(!scope.onLabel) { 
+        		scope.onLabel = 'On'; 
+        	}
+        	if(!scope.offLabel) { 
+        		scope.offLabel = 'Off'; 
+        	}
+        	if(!scope.knobLabel) { 
+        		scope.knobLabel = '\u00a0'; 
+        	}
+        	if(!scope.disabled) { 
+        		scope.disabled = false; 
+        	}
+
+        	element.on('click', function() {
+        		scope.$apply(scope.toggle);
+        	});
+        	
+        	scope.toggle = function toggle() {
+        		if(!scope.disabled) {
+    				scope.model = !scope.model;
+    			}
+    		};
+    	}
+  	};
 }]);
 
 })(angular);
@@ -3686,14 +3685,14 @@ $templateCache.put("components/footer/footer.html","<!-- Footer -->\r\n<nav clas
 $templateCache.put("components/graph/lineGraph.html","<div class=\"lineGraphContainer\" style=\"width:100%; position:relative\"> \r\n	<img src=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAAAKCAIAAADNfmwpAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAsSURBVEhL7dAxAQAwEAOh+jedWvjbQQJvnMkKZAWyAlmBrEBWICuQFcg62z7kl6zuJtr7XQAAAABJRU5ErkJggg==\" style=\"width:100%;\" class=\"aspect10x1\"></img>\r\n	<div style=\"position: absolute;	top: 0px; left: 0px; height: 100%;width:100%\" >\r\n		<svg class=\"lineGraphSvg\" preserveAspectRatio=\"xMinYMin meet\" xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" width=\"100%\" height=\"100%\" viewBox=\"0 0 1050 105\" \r\n					ng-mouseenter=\"mouseEnter($event)\" ng-mouseleave=\"mouseLeave($event)\" ng-mousemove=\"mouseMove($event)\" ng-click=\"mouseClick($event)\">\r\n			<g>\r\n				<text y=\"16\" x=\"57\" style=\"fill-opacity:0.6; font-size:120%\">{{config.heading}}</text>\r\n			</g>\r\n  			<g transform=\"translate(0, 2)\">\r\n  				<g class=\"zeroLine\" ng-show=\"showZeroLine && minY < 0\">\r\n					<line x1=\"50\" ng-attr-y1=\"{{90 * (1 + minY/rangeY)}}\" x2=\"1050\" ng-attr-y2=\"{{90 * (1 + minY/rangeY)}}\" style=\"stroke:blue\" stroke-width=\"1\" stroke-opacity=\"0.6\" />\r\n				</g>\r\n  				<g ng-repeat=\"points in data\" class=\"context\" style=\"cursor:pointer\" transform=\"translate(50)\" explorer-line>\r\n					<path ng-attr-fill=\"{{points.style.fill}}\" class=\"area\" ng-attr-d=\"{{path}}\" ng-attr-fill-opacity=\"{{points.style.fillOpacity}}\"></path>\r\n					<path ng-attr-d=\"{{line}}\" ng-attr-stroke=\"{{points.style.stroke}}\" ng-attr-stroke-width=\"{{points.style.strokeWidth}}\" fill-opacity=\"0\"></path> \r\n				</g>\r\n  				<g class=\"xAxis\">\r\n					<line x1=\"50\" y1=\"90\" x2=\"1050\" y2=\"90\" style=\"stroke:black\" />\r\n					<text transform=\"translate(1040 88)\" y=\"4\" dy=\".71em\" style=\"text-anchor:end\">{{config.xLabel}}</text>\r\n				</g>\r\n				<g class=\"yAxis\">\r\n					<line x1=\"50\" y1=\"0\" x2=\"50\" y2=\"90\" style=\"stroke:black\" />\r\n					<text transform=\"rotate(-90) translate(-10)\" y=\"6\" dy=\".71em\" style=\"text-anchor:end\">{{config.yLabel}}</text>\r\n					<g ng-repeat=\"tick in yTicks\">\r\n						<text font-size=\"80%\" style=\"text-anchor:end;\" ng-attr-transform=\"translate(45 {{90 * (1 - (tick - minY)/ rangeY) +3}})\">{{round(tick)}}</text>\r\n						<line x1=\"45\" x2=\"50\" ng-attr-y1=\"{{90 * (1 - (tick - minY)/ rangeY)}}\" ng-attr-y2=\"{{90 * (1 - (tick - minY)/ rangeY)}}\" style=\"stroke:black\"></line>\r\n					</g>\r\n				</g>\r\n				<g visibility=\"visible\" ng-show=\"position\">\r\n					<line x1=\"{{50 + position.graphX}}\" y1=\"-5\" x2=\"{{50 + position.graphX}}\" y2=\"95\" style=\"stroke:black\" />\r\n  				</g>\r\n  			</g>\r\n  			<g transform=\"translate(0 88)\">\r\n				<text y=\"6\" dy=\".71em\" transform=\"translate(50)\">{{config.leftText}}</text>\r\n				<text y=\"6\" dy=\".71em\" transform=\"translate(250)\">{{config.middleText}}</text>\r\n  			</g>\r\n		</svg>\r\n	</div>\r\n</div>");
 $templateCache.put("components/header/header.html","<div class=\"container-full\" style=\"padding-right:10px; padding-left:10px\">\r\n    <div class=\"navbar-header\">\r\n\r\n        <button type=\"button\" class=\"navbar-toggle\" data-toggle=\"collapse\" data-target=\".ga-header-collapse\">\r\n            <span class=\"sr-only\">Toggle navigation</span>\r\n            <span class=\"icon-bar\"></span>\r\n            <span class=\"icon-bar\"></span>\r\n            <span class=\"icon-bar\"></span>\r\n        </button>\r\n\r\n        <a href=\"http://www.ga.gov.au\" class=\"hidden-xs\"><img src=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAABFCAYAAADjA8yOAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAATsAAAE7AGKbv1yAAAAB3RJTUUH3gYLFggT6G2xSgAADqpJREFUeNrtnW2sbFV5x3/L8CagsrligVBfNnAbSBOFuZEaP6jpHL/0hTR1boBcbBqbOS32Q0nTO6chxlhKOscPimIIc0wstjElM34opm1KZtK3pBX1jA1WRK1noFQL1vYMocVXmtUP+//cec5yZu7MeeHiYf2TndmzZ+2118uznvV/nvWsPZCRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkXEACP5LjPGFfXgI7RjjWu6GjD3I0I7vZ52hQrSBEmiEEGrAKMa4mrsnY6942Rl6bg9o6LwODHNXZLxoBTqEUEjzEkJopL9JmEe6NAbqIYQyd0fGi5JDS2i3TRPHGMOUNF0JcxljXMldkbEfHPpANHSMcQysG60IITSnJFsXb16bU9hOCCGmWj4j40xwaM+L2ybUIYRmCGEbaIUQon3KUPTCXHdfa7mrMhbBQXo5vBAWOogxbgAbC2j5gaaTZu6mjBeDQBemqWOMx3aZR0ufvdxVGWfSKCyBLZdvcN6NYYxxuEAeLaANjGOMFy/z7BjjKHftS9MoPGuJG7sxxuMLJu8k9/4r8HLgeeD8EMLfAE8AFwHPKNl5wPf1CfBufW4sWcdmCOHbwINZsDPlmCXMTSoX26Jp68nl/wHuB14B/JyEOYUX6Dc5yjJYsk494LeB/wohjOVxychejh24AHg4hNBKvA+pMDdS7Sw8IGEeAG/T55OiPBvAo8CVVMvhzyQCP9JCTdOe7xdhRE0IIZS6Xge+k/D4Zaex4kx3zH6XIWmz4qUu0D8D/CrV6l5zRoPVZgjzGHhK5w33+XVgS7TgMnlFSuDS5P4+1SJNR5y6D2zJR1262aAGNGOM68BR4C/2QDnae1m5tFXSJdKb67Jv9M7bIHsoRz2EsKX8miGErs5bh4A715cWaGnGOvA14LsSztGMDuzP0IgFcDvweg0Gi+M4CnxL+V+vvEvgHOBCd/8swWoCm8C39P1CoJA/++tu8OxGkzV32+mqT3uZezQIPYa7sB2mzZZ9GeHHY4xrsoHGh0CYC6C7NIeOMY5DCDcBrwNOAkeAz4YQTgBPxxgHzgicJswjYAX4a/HjFTXyCnCVBskFwF8C71T6/1xi5iiAX5YQvhz4K1GZjwP37bK9ms64XFMbNDQDjCQQFiG44SIHxxqsXWCs6zZ47b4GsKpn1HV9zfN8KYdiygCrSTjXRLMKpwTGU8JwO9OM6hjjqlvksrwL0cCxm/F6yttm3lWXbsBOl2oL+BTwFtfvdT176NKOXL17evapsqud6yrH+pT7Bsqv65TX2jwB3nGoAn8mIfxz4C5pn/uAttK0gDjjsDQP6KiLPtSBW93vt6pybXf05+SbHn01/keB64AbgbuBVlqneYfq21UH+vKX7jmFO2/q3O6zdJtAXfdG1XlTn/fr3PLpuHR9nfer7ojoHmuTqLaz53bd9Yarh5Ujnqa+W7q/bnnomtWp1O/WJjX9Vrr+6bs+tWst5bOt51gZO8orJnVqJm255eQhujJE4O1qvzjF+TBfE0pz3AH8iR5iozMAtYTDzvI4IA38jAzC48BNwOXAQFP05RqF3qNxfAkPRx24E/gy8Pv6/sguPCRNaZWe19aeiydeEzvfAnou3djNXvb9mPzp/6RyNU5DqXwbjpJ0I/c5cDbETJomPt12x0lL58pal2Y0RWXt0VDaRmILoRnmYl9fUajRlFm758o+cGUv3UzWmvKMgbvvLGv3pI0XMwpjjKMY458Cfxhj/FvgXcC/uKmzNufeoQT2Kfmcb1FBr9f0OVAjXq3RbecXSXDWnGCfbjHmghjjhnjigzHGP15kASeBTXk27RUzAqusfj11eAF05xiSo4Qf15co03BZPq92HXsD1XW+5fXMlFtLCd14ig0yEg8PnvPvoo3nodQzrtxtBOZpBdo6SVyyBlwMXKEpoDdH0EZOSH5arrjCcdTfEAcqgC86jfjvrrEb0m4rTnMcl5ZDfPsfJPBfTTp0WUOjCWyoQdccN2vN8mDYPRrcOzTjHOHuOM69SNt31MZjZzcs4nZbm6LpSLReWtahFMmGyjjQrDOm2l1UhhBqBxT9OHIen8LcsXtybc7gWZtA4b63k9+3Z/DaruNPbVGXW/XbncDf63wL+LAGyP3AB5T+OgnTCeVzP/CYOri/AD+sG49dgDsbt+9KS3jeF/0zHb/eUn22dM14sed9DZfWOHXH/W68+h6X7qRr09t1zbjutsrh+WvH8++kXg1XPnue5/dN/d41+8Bx8C2XT3OKvWJcu5W0oXFiO7/VcV5vG3UdL+5rpt9y7XBjcp8/b7r+2inkqUA76X878PNyhz2mSpRuii312UqmR/vtQeBp4HFp8g8BX9ACyxC4BHit0z414Hzgp4BPAzcAn9P1a4ATSvusvC1XyWAdSZMMpTEbwL0aQHep/E/tRmsfJoQQisO4arpQgL9U+SXA2cCPEhJv/HKc8Oex3HE2Dfy6FklK9/0VEtoa8FpN7cbXjgDnAh+U4D4vIR5pYHwM+IzoxknRlEe0KFOKvjQ01R6VG2kMvPqlLsxTjNlDi5elzvgk0L4GfE8C9i7gWgnh/xm/9RasGs18lQXwH8DD5pbRva9R+i+HEO6WkJ8LHNXvdfMzAn/gPAKflBfjk7r/a/JvfwW4QvduAb8EfF6CfgfwOnGyTrqJIOMQzkTJ966Mr4Yc+OZvfA/wszK86qIZG87AGwPHNAC6VNur1qasoDXF01ZCCH+n/C4Vn36f8rTVSFsKvxD4ks/PBNM55LvOE3JLjPF33YLHE9LkV9hgyxr78FIOpgh0IXrQB/5RR98R9vTYlvZNF1k2HZGPUxYV+u4eMxZq7lrXGRbGyzveOEgWRDreeHXGTN3x/Y4Zffk4HMfpNHTNuXleLzpw2WkGyX8n34+482eBV7rvT4oy3Cx33Ko0d90Zh405iw0jlo9FqLlZZGOadnZlyPjJw9pCXo5dqP4G8F75nNedUNacMA6kNW1xYUXauGCyGpYK7ED7C80lBkn8Q0amHHO9HLOc/M7pXciALBSS2KGKQf5nCa0FnIwkvGtuUaFwCwQWGzF0fLx0nyPHmVtKd65d07PzjvCM0wu0BLgtoS3dtG3O7DcCN2upuRSNeDrGuKolYUtv/NUMR3tfx4hJfHXNKIEOi8gqY4wDt3pXyu33fqpNAetUy9OtEELfypmFPHs5TlEOUYdLxJ+fk3fgIapItnuoFknqVIsuUO00MWE7FZQjilCjiia7UsHr5r047gS5JkGvO61sHo71lPPKo7Eq+nGuvBivAu6JMY6kzX9A5bPuAL8HXK3XJ2QccsoxlUNLKC6iWrwodX4e1QKHxcw+B3wEeHOMcV33PEQVSWdkvUEV1HJKyJPYX4tSM/dbaVp5yo6EunPpjZWmL6P0SX0OqVYYLwG+IYN2G/hejPHeBRuo6WjPUOUf7mMH2OrqxkFv4tWzyn0OIJr1LDOsLU7cYp17L6RAzwrwH0i7fVH+6Lt1fV1BSpdRLWhcxCTIxQKybbr/ReO92qw6dBU3fAF41F49oA72L3FsMwl+atizXLTXUGU4R4OqBH5B1y2U9DHgE4vYCI5OWaSX+bL38917pdplxB53pSyAlp53fBeC0uDHw2BnwimYgerV1vkL+k6VhbwcFvlkgpS8QfQG0RNDU9f/jWrFzoxA2yt4NlWUnK0q/q+Oa6ii7L6vdEZ1rqIK6r5A6Vedxm+r8Qo3YFrAGyTMUAXi9BboQAtfvdJrTv9SdttNMoVW+QFrMS+4dHU3AG0XyEAUqeYM48LRrjLJ19LZwLd8x7M0sF65VlidXNl85N5Iv9WdN8oM9nUmO1es/LWkrL6eUUK8ymRXz9C1E/u9qDV3YWWJXR1bwG06v5Fqlc+CtG0x41eUpsFkx4HFW3SYRGHZjgmLuLIFl/uUx31K03JeEVuM+aA+t9gZEVjbxU6VuTs8XB26THaybPrrLvqwCWwm923q0yLXrC0skm6TyY4Qi4CLrl19xF3h2rNPEgHpFpUsEq8zZeeNL0dLz7d2PXWf+sa+W5luUzksmrDld93w4zt8tn0dDnJhZbcvazwmg+yPqOKRf+iMPOPMt4mWNDSibXRvKo+nNJovZbKocUIUpSZj8yzgYnk51pnE6/Z0vEoN9oCjOrsJOve+8lOc0B01dfZY9bDXOdSY7KZohBCucwNuQxqxpbKuGSdPKIEF43vPTM/RkZSibDghN5ti2qKQBWpZLHORcPbRlDawmcJmtJ7fLKDrx6g2Ifu61BPF6PMu2Bkzf6AeqKUFOsZoL295kCpwqaFCW/xGTQIwpAoOeoxq8+QRudpWdI+N5F9z9OVpqhXK3wK+aV4QBZX71cPfBK6lCnxaizHesZepzHWaf8aQSezxdnJ9ZUbHHHEenzbwVutEuR/XpwhRzeU5mjfgZGesJb78HulqmaiIGwh+Y8U0+M2s84L37TVuw2TtYF7bjlzeB74YtpfX6Y7ld95wGsEa+U55RYZUO7s/FWM8GWP8Hf1u+/asgsfVaRsxxpukcb/tNIkFda87Y/Jy8er9esfEemIvWNkGMcbHnXdn6DQz7Nw9YsKz4uyDMdUO8nLKTo+h47Qls3ei9Kj+5aAhYX3eD5Qpg6tpry5wBqEPJEvL3VSZe0lepffpO81rr3kYJh6VWcalzVIv7Atu9sBjChbfHWI7gtNd25sL3l86btZgH4ONlN9mwk+bye6PTXetyWS3R9PxauPaphlP3aejr/yNgm0728N+azuua+892XL83edbS7hzn8mulJqbaVqOh3eTZ3Xd8wr3vXRlabjdKX3Ht7vAO3QtPb+Oyc6aHUFoBx6cdFB/6+Ys9LqbZu3dCzU14li0Zf107rX8EsaMZf3Q+/lA2whrS9sWxjlOpsBVqhe0bGo6H05zt2VhztizH3qfBXwzMWIsbqNur+s1n2gOxM/Ykx86IyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyNjCv4fa79bOV37jv0AAAAASUVORK5CYII=\" alt=\"Australian Government - Geoscience Australia\" class=\"logo\"></img></a>\r\n        <a href=\"http://www.ga.gov.au\" class=\"visible-xs\"><img src=\"data:image/png;base64,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\" alt=\"Australian Government - Geoscience Australia\" class=\"logo-stacked\"></img></a>\r\n        <a href=\"#/\" class=\"appTitle visible-xs\"><h1 style=\"font-size:120%\">{{heading}}</h1></a>\r\n    </div>\r\n    <div class=\"navbar-collapse collapse ga-header-collapse\">\r\n        <ul class=\"nav navbar-nav\">\r\n            <li class=\"hidden-xs\"><a href=\"#/\"><h1 class=\"applicationTitle\">{{heading}}</h1></a></li>\r\n        </ul>\r\n        <ul class=\"nav navbar-nav navbar-right\">				\r\n        	<li mars-user-details ng-show=\"username\" role=\"menuitem\" style=\"padding-right:10px\"></li>\r\n			<li mars-version-display role=\"menuitem\"></li>\r\n			<li style=\"width:10px\"></li>\r\n        </ul>\r\n        <div class=\"breadcrumbsContainer hidden-xs\">\r\n            <ul class=\"breadcrumbs\">\r\n                <li class=\"first\"><a href=\"/\">Home</a></li>\r\n            </ul>\r\n        </div>\r\n    </div><!--/.nav-collapse -->\r\n</div>\r\n\r\n<!-- Strap -->\r\n<div class=\"row\">\r\n    <div class=\"col-md-12\">\r\n        <div class=\"strap-blue\">\r\n        </div>\r\n        <div class=\"strap-white\">\r\n        </div>\r\n        <div class=\"strap-red\">\r\n        </div>\r\n    </div>\r\n</div>\r\n");
 $templateCache.put("components/info/info.html","<div class=\"marsinfo\" ng-show=\"isOpen\">\r\n	<div class=\"marsinfo-inner\">\r\n      <h3 ng-show=\"title\" ng-bind=\"title\" class=\"marsinfo-title\"></h3>\r\n      <div class=\"marsinfo-content\" ng-transclude></div>\r\n	</div>\r\n</div>");
-$templateCache.put("components/knob/knob.html","<input class=\"preset1\" type=\"range\" tabindex=\"-1\" style=\"position: absolute; top: -10000px;\" knob-handler>\r\n<svg version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\"  width=\"100%\" height=\"100%\" class=\"knob\" viewbox=\"0 0 200 200\" ng-attr-style=\"{{checkDisabled()}}\">\r\n	<defs>\r\n   		<filter id=\"{{knobShadow}}\" height=\"150%\" width=\"150%\">\r\n       		<feGaussianBlur in=\"SourceAlpha\" stdDeviation=\"2\"/>\r\n   	    	<feOffset dx=\"0\" dy=\"3\" result=\"offsetblur\"/>\r\n        	<feMerge>\r\n	   	        <feMergeNode/>\r\n    	   	    <feMergeNode in=\"SourceGraphic\"/>\r\n	       	</feMerge>\r\n	   	</filter>\r\n	</defs>\r\n	<circle cx=\"100\" cy=\"100\" r=\"60.606061\" ng-attr-style=\"filter:url(#{{knobShadow}});fill:{{config.circleColor}}\"></circle>\r\n	<rect x=\"97\" y=\"39.4\" width=\"6\" height=\"40\" class=\" pointer\" ng-attr-transform=\"rotate({{angle}} 100 100)\" ng-attr-fill={{config.pointerColor}}></rect>\r\n	<g class=\" scale\">\r\n		<text ng-repeat=\"tick in ticks\" x=\"95\" y=\"23.8\" width=\"10\" height=\"10\" \r\n				ng-attr-transform=\"rotate({{config.startAngle + $index * config.degrees + 3}} 100 100)\" style=\"text-anchor:middle\">{{tick}}</text>\r\n	</g>\r\n	<g>\r\n		<text y=\"175\" dy=\".71em\" x=\"100\" style=\"text-anchor:middle; font-weight:bold\">{{config.label}}</text>\r\n	</g>\r\n</svg>");
 $templateCache.put("components/legend/legend.html","<div>    \r\n    <div class=\"modal-header\" drag-parent parentClass=\"legendContainer\">\r\n        <h4 class=\"modal-title\">{{heading}}</h4>\r\n    </div>\r\n	<div class=\"legendImageContainer\" style=\"max-height:450px;overflow-y:auto; overflow-x:hidden;padding-bottom:5px\"> \r\n		<img ng-src=\"{{legend}}\"></img>\r\n	</div>\r\n</div>\r\n");
 $templateCache.put("components/message/messages.html","\r\n<span ng-controller=\"MessageController\" style=\"z-index:3\">\r\n  <span ng-show=\"historic.length > 10000\">\r\n    <a href=\"javascript:;\" title=\"Show recent messages\"><i class=\"fa fa-comments-o\" style=\"color:black\"></i></a>\r\n  </span>\r\n  <div ng-show=\"message\" class=\"alert\" role=\"alert\" \r\n  		ng-class=\'{\"alert-success\":(message.type==\"success\"),\"alert-info\":(message.type==\"info\"),\"alert-warning\":(message.type==\"warn\"),\"alert-danger\":(message.type==\"error\")}\'>\r\n    {{message.text}} <a href=\"javascript:;\" ng-click=\"removeMessage()\"><i class=\"fa fa-times-circle\" style=\"font-size:120%\"></i></a>\r\n  </div>\r\n</div>");
+$templateCache.put("components/knob/knob.html","<input class=\"preset1\" type=\"range\" tabindex=\"-1\" style=\"position: absolute; top: -10000px;\" knob-handler>\r\n<svg version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\"  width=\"100%\" height=\"100%\" class=\"knob\" viewbox=\"0 0 200 200\" ng-attr-style=\"{{checkDisabled()}}\">\r\n	<defs>\r\n   		<filter id=\"{{knobShadow}}\" height=\"150%\" width=\"150%\">\r\n       		<feGaussianBlur in=\"SourceAlpha\" stdDeviation=\"2\"/>\r\n   	    	<feOffset dx=\"0\" dy=\"3\" result=\"offsetblur\"/>\r\n        	<feMerge>\r\n	   	        <feMergeNode/>\r\n    	   	    <feMergeNode in=\"SourceGraphic\"/>\r\n	       	</feMerge>\r\n	   	</filter>\r\n	</defs>\r\n	<circle cx=\"100\" cy=\"100\" r=\"60.606061\" ng-attr-style=\"filter:url(#{{knobShadow}});fill:{{config.circleColor}}\"></circle>\r\n	<rect x=\"97\" y=\"39.4\" width=\"6\" height=\"40\" class=\" pointer\" ng-attr-transform=\"rotate({{angle}} 100 100)\" ng-attr-fill={{config.pointerColor}}></rect>\r\n	<g class=\" scale\">\r\n		<text ng-repeat=\"tick in ticks\" x=\"95\" y=\"23.8\" width=\"10\" height=\"10\" \r\n				ng-attr-transform=\"rotate({{config.startAngle + $index * config.degrees + 3}} 100 100)\" style=\"text-anchor:middle\">{{tick}}</text>\r\n	</g>\r\n	<g>\r\n		<text y=\"175\" dy=\".71em\" x=\"100\" style=\"text-anchor:middle; font-weight:bold\">{{config.label}}</text>\r\n	</g>\r\n</svg>");
 $templateCache.put("components/modal/modal.html","<div class=\"exp-modal-outer\">\r\n	<div class=\"exp-backdrop fade  in\" ng-show=\"isModal && isOpen\" \r\n		ng-class=\"{in: animate}\"></div>\r\n	<div class=\"exp-modal\" ng-show=\"isOpen\" exp-modal-up>\r\n		<div class=\"exp-modal-inner\">\r\n    	  <div drag-parent parentClass=\"exp-modal-outer\" class=\"exp-modal-title\" ng-show=\"title\">\r\n      		<i class=\"fa\" ng-class=\"iconClass\"></i> \r\n      		<span ng-bind=\"title\"></span>\r\n      		<button title=\"Close popup dialog\" ng-click=\"isOpen=false\" class=\"exp-modal-close\" type=\"button\"><i class=\"fa fa-close\"></i></button> \r\n	      </div>      \r\n    	  <div class=\"exp-modal-content\" style=\"{{containerStyle}}\" ng-class=\"{\'exp-modal-no-title\':!title}\" ng-transclude></div>\r\n		</div>\r\n	</div>\r\n</div>");
 $templateCache.put("components/popover/popover.html","<div class=\"popover {{direction}}\" ng-class=\"containerClass\" ng-show=\"show\">\r\n  <div class=\"arrow\"></div>\r\n  <div class=\"popover-inner\" ng-transclude></div>\r\n</div>");
 $templateCache.put("components/user/userdetails.html","<span class=\"badge\" title=\"Your are logged in\">Logon: {{username}}</span>");
-$templateCache.put("components/version/versionDisplay.html","<span class=\"badge\">Version: {{version}}</span>\r\n");
 $templateCache.put("components/usermaps/add-maps.html","<div>\r\n	<div class=\"marsMapsTreeview\">\r\n		\r\n		<p style=\"text-align: left; margin: 10px; font-size: 16px; padding: 40px 5px 0px 0px;\">\r\n			<strong>Your Maps:</strong>\r\n		</p>\r\n		\r\n		<div add-maps></div>\r\n	</div>\r\n	<layer-inspector active=\"active\"></layer-inspector>\r\n</div>");
 $templateCache.put("components/usermaps/addmaps.html","<div ng-form>\r\n	<div ng-repeat=\"map in maps | orderBy : \'name\'\" style=\"padding:7px;padding-left:10px;position:relative;height:1.4em\" ng-class-even=\"\'even\'\" ng-class-odd=\"\'active\'\">\r\n		<div style=\"float:left\">\r\n			<a href=\"javascript:;\" class=\"featureLink\" ng-click=\"makeActive()\" ng-class=\"{active:(map == active)}\" >\r\n				{{map.name}} \r\n			</a>\r\n		</div>\r\n		<div style=\"float:right\">\r\n			<a class=\"featureLink\" href=\"javascript:;\" title=\"Show legend for this map\" ng-show=\"map.legendUrl\" heading=\"map.name + \' Legend\'\"\r\n				explorer-legend legend=\"map.legendUrl\"><i class=\"fa fa-list-ul\"></i></a>\r\n			<a class=\"featureLink\" href=\"javascript:;\" title=\"Edit the map\" \r\n				ng-click=\"editMap()\"><i class=\"fa fa-pencil\"></i></a>	\r\n			<a class=\"featureLink\" href=\"javascript:;\" title=\"Show on map\" \r\n				ng-click=\"toggleShow()\"><i class=\"fa\" ng-class=\"{\'fa-eye\':(!map.layer.visibility), \'fa-eye-slash\':map.layer.visibility}\"></i></a>	\r\n			<a href=\"javascript:\" exp-confirm=\"\'Are you sure that you want to delete this map?\'\" success=\"removeMap()\" title=\"Remove map from application. Cannot be undone.\">\r\n				<i class=\"fa fa-remove\" title=\"Remove this feature from your added maps.\"></i>\r\n			</a>						\r\n		</div>\r\n	</div>\r\n	<vectors-display vectors=\"vectors\"></vectors-display>\r\n	\r\n	<accordion>\r\n		<accordion-group heading=\"{{status.edit && \'Edit\' || \'Add\'}} a map...\" is-open=\"status.mapOpen\">\r\n			<div class=\"addMapsDialog\">\r\n				<div>\r\n					<label for=\"addMapsName\">Name</label>\r\n					<input type=\"text\" ng-model=\"work.name\" id=\"addMapsName\" required=\"required\"/>\r\n				</div>\r\n				<div>\r\n					<label for=\"addMapsDescription\">Description</label>\r\n					<input type=\"text\" ng-model=\"work.description\" id=\"addMapsDescription\"/>\r\n				</div>\r\n				<div>\r\n					<label for=\"addMapsUrl\">WMS URL</label>\r\n					<input type=\"text\" ng-model=\"work.url\" id=\"addMapsUrl\" required=\"required\"/>\r\n				</div>\r\n				<div>\r\n					<label for=\"addMapsLayers\">Layers</label>\r\n					<div ng-repeat=\"layer in work.layers | reverse\" ng-class-even=\"\'even\'\" ng-class-odd=\"\'active\'\">\r\n						<div style=\"padding:2px\">\r\n							{{layer}}\r\n							<div style=\"float:right\">\r\n								<a class=\"featureLink\" href=\"javascript:;\" title=\"Move layer higher on map\" ng-disabled=\"$first\"\r\n									ng-click=\"shuffleDown()\"><i class=\"fa fa-arrow-up\"></i></a>	\r\n								<a class=\"featureLink\" href=\"javascript:;\" title=\"Move layer lower on map\" ng-disabled=\"$last\"\r\n									ng-click=\"shuffleUp()\"><i class=\"fa fa-arrow-down\"></i></a>	\r\n								<a href=\"javascript:\" exp-confirm=\"\'Are you sure that you want to delete this map?\'\" success=\"removeLayer()\" title=\"Remove map from application.\">\r\n									<i class=\"fa fa-remove\" title=\"Remove this layer from your added maps.\"></i>\r\n								</a>						\r\n							</div>\r\n						</div>\r\n					</div>\r\n					<input ng-model=\"workLayer\" ng-required=\"work.layers.length == 0\" \r\n							exp-enter=\"addLayer()\" title=\"Hit enter after entering each layer to add the layer\"/>\r\n					<button ng-click=\"addLayer()\" title=\"You can also use the enter key to add layer from the previous input\">Add</button>\r\n				</div>\r\n				<div>\r\n					<label for=\"addMapsThumbnailUrl\">Thumbnail URL</label>\r\n					<input type=\"text\" ng-model=\"work.thumbnailUrl\"/>\r\n				</div>\r\n				<div>\r\n					<label for=\"addMapsLegendUrl\">Legend URL</label>\r\n					<input type=\"text\" ng-model=\"work.legendUrl\"/>\r\n				</div>\r\n			</div>\r\n	\r\n			<div class=\"addMapButtons\">\r\n				<div  class=\"buttons\" style=\"float:right\">\r\n					<button type=\"button\" class=\"btn btn-default\" ng-click=\"clear()\" title=\"Abandon updates\">Cancel</button>\r\n					<button type=\"button\" class=\"btn btn-default\" ng-click=\"addMap($event)\" ng-disabled=\"!isComplete()\" \r\n								title=\"Click to complete updates\">{{status.edit && \'Update\' || \'Add\'}}</button>\r\n				</div>\r\n			</div>\r\n		</accordion-group>\r\n		<accordion-group heading=\"{{status.vectorEdit && \'Edit\' || \'Add\'}} a vector...\" is-open=\"status.vectorOpen\">\r\n			<div mars-vector-edit vectors=\"vectors\">\r\n		</accordion-group>\r\n	</accordion>\r\n</div>");
 $templateCache.put("components/usermaps/vectorDisplay.html","<div ng-repeat=\"vector in vectors | orderBy : \'name\'\" style=\"padding:7px;padding-left:10px;position:relative;min-height:1.4em\" ng-class-even=\"\'even\'\" ng-class-odd=\"\'active\'\">\r\n	<div ng-show=\"vector.layer.features.length < 2\" style=\"clear:both\">\r\n		<div style=\"float:left\">\r\n			<a href=\"javascript:;\" class=\"featureLink\" ng-click=\"makeActive()\" ng-class=\"{active:(vector == active)}\" >\r\n				{{vector.name}} \r\n			</a>\r\n		</div>\r\n		<div style=\"float:right\">\r\n			<a class=\"featureLink\" href=\"javascript:;\" title=\"Plot feature\'s elevation\" ng-show=\"isPath()\" \r\n				ng-click=\"showElevation()\"><i class=\"fa fa-align-left fa-rotate-270\"></i></a>\r\n			<a class=\"featureLink\" href=\"javascript:;\" title=\"Edit the vector layer\" \r\n				ng-click=\"vectorEdit()\"><i class=\"fa fa-pencil\"></i></a>\r\n			<a class=\"featureLink\" href=\"javascript:;\" title=\"Show on map\" \r\n				ng-click=\"toggle()\"><i class=\"fa\" ng-class=\"{\'fa-eye\':(!vector.show), \'fa-eye-slash\':vector.show}\"></i></a>\r\n			<a class=\"featureLink\" href=\"javascript:;\" title=\"Pan map to feature\" \r\n				ng-click=\"panToVector()\"><i class=\"fa fa-flag\"></i></a>	\r\n			<a href=\"javascript:\"  title=\"Remove vector layer. Cannot be undone.\"\r\n				exp-confirm=\"\'Are you sure that you want to delete this map?\'\" success=\"remove()\"><i class=\"fa fa-remove\"></i></a>						\r\n		</div>\r\n	</div>\r\n	\r\n	<div ng-show=\"vector.layer.features.length > 1\" style=\"clear:both\">\r\n		<div style=\"float:left\">\r\n			<i class=\"fa fa-caret-right\" ng-class=\"{\'fa-caret-down\':expanded,\'fa-caret-right\':(!expanded)}\" role=\"presentation\" ng-click=\"expanded = !expanded\"></i> <strong>{{vector.name}}</strong>\r\n		</div>\r\n	\r\n		<div style=\"float:right\">\r\n			<a class=\"featureLink\" href=\"javascript:;\" title=\"Edit the vector layer\" \r\n				ng-click=\"vectorEdit()\"><i class=\"fa fa-pencil\"></i></a>\r\n			<a class=\"featureLink\" href=\"javascript:;\" title=\"Show on map\" \r\n				ng-click=\"toggle()\"><i class=\"fa\" ng-class=\"{\'fa-eye\':(!vector.show), \'fa-eye-slash\':vector.show}\"></i></a>\r\n			<a class=\"featureLink\" href=\"javascript:;\" title=\"Pan map to feature\" \r\n				ng-click=\"panToVector()\"><i class=\"fa fa-flag\"></i></a>	\r\n			<a href=\"javascript:\"  title=\"Remove vector layer. Cannot be undone.\"\r\n				exp-confirm=\"\'Are you sure that you want to delete this map?\'\" success=\"remove()\"><i class=\"fa fa-remove\"></i></a>						\r\n		</div>\r\n		\r\n		<div style=\"clear:both\" ng-show=\"expanded\">\r\n			<div ng-repeat=\"feature in vector.layer.features\">\r\n				<div style=\"float:left; padding-left:10px\">\r\n					{{feature.fid ? feature.fid : feature.data.name ? feature.data.name : \'Feature #\' + $index}} \r\n				</div>\r\n				<div style=\"float:right\">\r\n					<a class=\"featureLink\" href=\"javascript:;\" title=\"Plot feature\'s elevation\" ng-show=\"isFeaturePath()\" \r\n						ng-click=\"showFeatureElevation()\"><i class=\"fa fa-align-left fa-rotate-270\"></i></a>\r\n					<a class=\"featureLink\" href=\"javascript:;\" title=\"Pan map to feature\" \r\n						ng-click=\"panToFeature()\"><i class=\"fa fa-flag\"></i></a>			\r\n				</div>\r\n				<div style=\"clear:both\"></div>\r\n			</div>\r\n		</div>\r\n		\r\n	</div>\r\n</div>");
-$templateCache.put("components/usermaps/vectorEdit.html","<div class=\"addMapsDialog\" ng-if=\"!status.vectorEdit\">\r\n	<form method=\"POST\" action=\"service/upload/file\" enctype=\"multipart/form-data\" ajax-form update=\"cancelVectorEdit()\" cancel=\"cancelVectorEdit()\">\r\n		<div>\r\n			<label for=\"addVectorName\">Name</label>\r\n			<input type=\"text\" ng-model=\"vector.name\" id=\"addVectorName\" name=\"vectorName\" required=\"required\"/>\r\n			<input type=\"hidden\" name=\"clientSessionId\" value=\"{{localClientSessionId}}\" />\r\n		</div>\r\n		<div>\r\n			<label for=\"addVectorDescription\">Description</label>\r\n			<input type=\"text\" ng-model=\"vector.description\" id=\"addVectorDescription\" name=\"vectorDescription\"/>\r\n		</div>\r\n		<div>\r\n			<label for=\"addVectorFile\">Select file to upload</label>\r\n			<input type=\"file\" name=\"vectorFile\"/>\r\n		</div>\r\n	\r\n		<div class=\"addMapButtons\">\r\n			<div  class=\"buttons\" style=\"float:right\">\r\n				<button type=\"reset\" class=\"btn btn-default\" title=\"Cancel adding vector file\">Cancel</button>\r\n				<button type=\"submit\" class=\"btn btn-default\" title=\"Add  vector file\" value=\"Add Vector File\">Add</button>\r\n			</div>\r\n		</div>\r\n	</form>\r\n</div>\r\n<div class=\"addMapsDialog\" ng-if=\"status.vectorEdit\">\r\n	<div>\r\n		<label for=\"addVectorName\">Name</label>\r\n		<input type=\"text\" ng-model=\"editVector.name\" id=\"addVectorName\" required=\"required\"/>\r\n	</div>\r\n	<div>\r\n		<label for=\"addVectorDescription\">Description</label>\r\n		<input type=\"text\" ng-model=\"editVector.description\" id=\"addVectorDescription\"/>\r\n	</div>	\r\n	<div class=\"addMapButtons\">\r\n		<div  class=\"buttons\" style=\"float:right\">\r\n			<button type=\"button\" class=\"btn btn-default\" ng-click=\"cancelVectorEdit()\" title=\"Cancel adding vector file\">Cancel</button>\r\n			<button type=\"button\" class=\"btn btn-default\" ng-click=\"saveVectors()\" title=\"Save updates for future sessions\">Save</button>\r\n		</div>\r\n	</div>\r\n</div>\r\n");}]);
+$templateCache.put("components/usermaps/vectorEdit.html","<div class=\"addMapsDialog\" ng-if=\"!status.vectorEdit\">\r\n	<form method=\"POST\" action=\"service/upload/file\" enctype=\"multipart/form-data\" ajax-form update=\"cancelVectorEdit()\" cancel=\"cancelVectorEdit()\">\r\n		<div>\r\n			<label for=\"addVectorName\">Name</label>\r\n			<input type=\"text\" ng-model=\"vector.name\" id=\"addVectorName\" name=\"vectorName\" required=\"required\"/>\r\n			<input type=\"hidden\" name=\"clientSessionId\" value=\"{{localClientSessionId}}\" />\r\n		</div>\r\n		<div>\r\n			<label for=\"addVectorDescription\">Description</label>\r\n			<input type=\"text\" ng-model=\"vector.description\" id=\"addVectorDescription\" name=\"vectorDescription\"/>\r\n		</div>\r\n		<div>\r\n			<label for=\"addVectorFile\">Select file to upload</label>\r\n			<input type=\"file\" name=\"vectorFile\"/>\r\n		</div>\r\n	\r\n		<div class=\"addMapButtons\">\r\n			<div  class=\"buttons\" style=\"float:right\">\r\n				<button type=\"reset\" class=\"btn btn-default\" title=\"Cancel adding vector file\">Cancel</button>\r\n				<button type=\"submit\" class=\"btn btn-default\" title=\"Add  vector file\" value=\"Add Vector File\">Add</button>\r\n			</div>\r\n		</div>\r\n	</form>\r\n</div>\r\n<div class=\"addMapsDialog\" ng-if=\"status.vectorEdit\">\r\n	<div>\r\n		<label for=\"addVectorName\">Name</label>\r\n		<input type=\"text\" ng-model=\"editVector.name\" id=\"addVectorName\" required=\"required\"/>\r\n	</div>\r\n	<div>\r\n		<label for=\"addVectorDescription\">Description</label>\r\n		<input type=\"text\" ng-model=\"editVector.description\" id=\"addVectorDescription\"/>\r\n	</div>	\r\n	<div class=\"addMapButtons\">\r\n		<div  class=\"buttons\" style=\"float:right\">\r\n			<button type=\"button\" class=\"btn btn-default\" ng-click=\"cancelVectorEdit()\" title=\"Cancel adding vector file\">Cancel</button>\r\n			<button type=\"button\" class=\"btn btn-default\" ng-click=\"saveVectors()\" title=\"Save updates for future sessions\">Save</button>\r\n		</div>\r\n	</div>\r\n</div>\r\n");
+$templateCache.put("components/version/versionDisplay.html","<span class=\"badge\">Version: {{version}}</span>\r\n");}]);

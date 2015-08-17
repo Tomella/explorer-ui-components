@@ -32,7 +32,7 @@ angular.module('explorer.header', [])
 	return {
 		transclude:true,
 		restrict:'EA',
-		templateUrl:"components/header/header.html?v=1",
+		templateUrl:"components/header/header.html",
 		scope : {
 			heading: "=",
 			headingtitle:"=",

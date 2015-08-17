@@ -63,7 +63,7 @@ angular.module("explorer.vector", ['explorer.flasher', 'explorer.broker', 'explo
 
 .directive("vectorsDisplay", ['vectorService', function(vectorService) {
 	return {
-		templateUrl : "components/usermaps/vectorDisplay.html?v=1",
+		templateUrl : "components/usermaps/vectorDisplay.html",
 		restrict : "AE",
 		require: '^addMaps',
 		link : function(scope, element) {

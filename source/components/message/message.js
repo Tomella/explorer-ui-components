@@ -11,7 +11,7 @@ angular.module("explorer.message", [])
 	return {
 		restrict:'AE',
 		controller : 'MessageController',
-		templateUrl : 'components/message/messages.html?v=1',
+		templateUrl : 'components/message/messages.html',
 		link : function(scope, element, attrs, controller) {
 		}
 	};	
