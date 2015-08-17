@@ -3,7 +3,6 @@
  */
 
 (function(angular) {
-	
 'use strict';
 
 angular.module("explorer.confirm", ['ui.bootstrap', 'explorer.focusme'])
@@ -27,7 +26,7 @@ angular.module("explorer.confirm", ['ui.bootstrap', 'explorer.focusme'])
 	return {
 		confirm : function(details) {
 			var modalInstance;
-			
+
 			details.confirmed = false;
 			modalInstance = $modal.open({
 				templateUrl: 'components/confirm/confirm.html',
@@ -50,8 +49,8 @@ angular.module("explorer.confirm", ['ui.bootstrap', 'explorer.focusme'])
 						return details.expConfirm;
 					}
 				}
-			});
-			
+			}); 
+
 			modalInstance.opened.then(function() {
 				// Maybe do something about the focus here
 			});

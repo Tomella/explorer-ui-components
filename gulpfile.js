@@ -38,9 +38,9 @@ gulp.task('scripts', function() {
 
 // Watch Files For Changes
 gulp.task('watch', function() {
-    gulp.watch('source/components/**/*.js', ['lint', 'scripts']);
+	// We watch both JS and HTML files.
+    gulp.watch('source/components/**/*(*.js|*.html)', ['lint', 'scripts']);
     gulp.watch('source/components/**/*.css', ['concatCss']);
-    gulp.watch('source/components/**/*.html', ['templates']);
     //gulp.watch('scss/*.scss', ['sass']);
 });
 

@@ -14,38 +14,6 @@ angular.module('page.footer', [])
 	};
 }])
 
-.run(["$templateCache", function($templateCache) {
-	  $templateCache.put("components/footer/footer.html",
-		'<nav class="navbar navbar-inverse navbar-fixed-bottom ga-footer" role="navigation" explorer-footer>' +
-		'  <div class="container-fluid">' +
-		'    <div class="navbar-header">' +
-		'      <button type="button" class="navbar-toggle" data-toggle="collapse"' +
-		'            data-target="#bs-example-navbar-collapse-1">' +
-		'        <span class="sr-only">Toggle footer</span>' +
-		'        <span class="icon-bar"></span>' +
-		'        <span class="icon-bar"></span>' +
-		'        <span class="icon-bar"></span>' +
-		'      </button>' +
-		'    </div>' +
-		'    <div class="navbar-nobrand">' +
-		'      <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">' +
-		'        <ul class="nav navbar-nav">' +
-		'          <li><a href="http://creativecommons.org/licenses/by/3.0/au/deed.en"><img' +
-		'               src="assets/img/cc-by.png" height="20px" alt="CC BY 3.0 AU"/></a></li>' +
-		'          <li><a href="http://www.ga.gov.au/copyright">Copyright</a></li>' +
-		'          <li><a href="http://www.ga.gov.au/disclaimer">Disclaimer</a></li>' +
-		'          <li><a href="http://www.ga.gov.au/privacy">Privacy</a></li>' +
-		'          <li><a href="http://www.ga.gov.au/accessibility">Accessibility</a></li>' +
-		'          <li><a href="http://www.ga.gov.au/ips">Information Publication Scheme</a></li>' +
-		'          <li><a href="http://www.ga.gov.au/ips/foi">Freedom of Information</a></li>' +
-		'          <li class="contact"><a href="http://www.ga.gov.au/contact-us" target="_blank">Contact us</a></li>' +
-		'        </ul>' +
-		'      </div>' +
-		'    </div>' +
-		'  </div>' +
-		'</nav>');
-}])
-
 .directive('explorerFooter', ['$timeout', function($timeout) {
 	return {
 		restrict:'EA',
