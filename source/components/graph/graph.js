@@ -1,6 +1,7 @@
 /*!
  * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
  */
+(function(angular, d3) {
 
 'use strict';
 
@@ -57,7 +58,7 @@ angular.module("graph", [])
 				if(scope.click) {
 					event.position = scope.position;
 					scope.click({event:event});
-				}				
+				}	
 			};
 			
 			scope.$watch("data", processData);
@@ -135,7 +136,7 @@ angular.module("graph", [])
 				scope.rangeY = scope.maxY - scope.minY;
 				scope.yTicks = ticks(scope.minY, scope.maxY);
 				
-				scope.y = d3.scale.linear().range([HEIGHT, 0])
+				scope.y = d3.scale.linear().range([HEIGHT, 0]);
 				scope.y.domain(d3.extent(points, function(d) {return d.z;}));
 			
 				function ticks(min, max, count) {
@@ -195,12 +196,6 @@ angular.module("graph", [])
 					$scope.calculateLines = $scope.calculatePath = dummyResponse;
 					return;
 				}
-
-				if(!window.scopers) {
-					window.scopers = {};
-				}
-				window.scopers[$scope.$id] = $scope;
-				
 				
 				$scope.minX = 0;
 				$scope.maxX = points.length;
@@ -218,14 +213,14 @@ angular.module("graph", [])
 					x(function(d, index) { return x(index);}).
 					y0(HEIGHT).
 					y1(function(d){
-						return y((d.z != null)?d.z:$scope.minY);
+						return y((d.z !== null)?d.z:$scope.minY);
 					});
 			
 				$scope.calculateLine = d3.svg.line().
 					interpolate("monotone").
 					x(function(d, index) { return x(index);}).
 					y(function(d){
-						return y((d.z != null)?d.z:$scope.minY);
+						return y((d.z !== null)?d.z:$scope.minY);
 					});
 
 				$scope.line = $scope.calculateLine(points);
@@ -240,3 +235,5 @@ angular.module("graph", [])
 		}]
 	};
 }]);
+
+})(angular, d3);

@@ -1,6 +1,7 @@
 /*!
  * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
  */
+(function(angular, OpenLayers) {
 
 'use strict';
 
@@ -51,7 +52,7 @@ angular.module("mars.zoom", [])
 		activateBoundingBox : function() {
 			// Lots of verbose OpenLayers follows
 			zoomContainer.deferred = $q.defer();
-			if(bboxControl == null) {				
+			if(bboxControl === null) {				
 				bboxLayer = new OpenLayers.Layer.Vector("Prepare to define an area to zoom to");
 				bboxControl = new OpenLayers.Control.DrawFeature(bboxLayer,
 						OpenLayers.Handler.RegularPolygon, {
@@ -113,7 +114,7 @@ angular.module("mars.zoom", [])
 		},
 	
 		isActiveBoundingBox : function() {
-			return bboxControl != null && bboxControl.active;
+			return bboxControl !== null && bboxControl.active;
 		},
 		
 		destroyBoundingBox : function() {
@@ -128,3 +129,5 @@ angular.module("mars.zoom", [])
 		}
 	};
 }]);
+
+})(angular, OpenLayers);

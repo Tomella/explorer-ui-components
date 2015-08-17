@@ -1,6 +1,7 @@
 /*!
  * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
  */
+(function(angular, sessionStorage) {
 
 'use strict';
 
@@ -129,3 +130,5 @@ angular.module("nedf.splash", ['explorer.projects'])
 		
 	};
 }]);
+
+})(angular, sessionStorage);

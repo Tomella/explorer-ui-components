@@ -1,6 +1,7 @@
 /*!
  * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
  */
+(function(angular) {
 
 'use strict';
 
@@ -86,7 +87,7 @@ angular.module("knob", [])
 			// Use linear mapper if none provided
 			if(!scope.mapFromPercentage) {
 				scope.mapFromPercentage = function(percent) {
-					return this.min + (this.max - this.min) * percent / 100
+					return this.min + (this.max - this.min) * percent / 100;
 				};
 			}
 			
@@ -174,5 +175,7 @@ angular.module("knob", [])
 				return value < scope.config.startAngle?scope.config.startAngle : value > max?max : value; 
 			}
 		}
-	}
+	};
 }]);
+
+})(angular);

@@ -1,7 +1,7 @@
 /*!
  * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
  */
-
+(function(angular) {
 'use strict';
 
 angular.module('explorer.usermaps', ['explorer.persist.local', 'explorer.flasher', 'explorer.vector'])
@@ -56,7 +56,7 @@ angular.module('explorer.usermaps', ['explorer.persist.local', 'explorer.flasher
 			$scope.setOpen = function(name) {
 				$scope.clearOpen();
 				$scope.status[name + "Open"] = true;
-			}
+			};
 			
 			$scope.work = angular.copy(template);
 	
@@ -114,7 +114,7 @@ angular.module('explorer.usermaps', ['explorer.persist.local', 'explorer.flasher
 	
 			$scope.shuffleUp = function() {
 				var index = $scope.work.layers.indexOf(this.layer);
-				if(index == 0) {
+				if(index === 0) {
 					return;
 				}
 				flashService.add("Refreshing view with new layer order.", 3000);
@@ -244,7 +244,8 @@ angular.module('explorer.usermaps', ['explorer.persist.local', 'explorer.flasher
 						this.layer.setVisibility(false);
 					}
 					return this.layer.visibility;
-				}
+				};
+				
 				return map;
 			}
 		}]
@@ -310,7 +311,8 @@ angular.module('explorer.usermaps', ['explorer.persist.local', 'explorer.flasher
 					isBaseLayer:false,
 					opacity:1,
 					legend : details.legend
-				}
+				};
+				
 				details.layer = mapService.createLayer(details);
 				mapService.getMap().then(function(map) {
 					map.addLayer(details.layer);
@@ -331,7 +333,9 @@ angular.module('explorer.usermaps', ['explorer.persist.local', 'explorer.flasher
 				});
 				return deferred.promise;
 			}
-			return $q.when(details)
+			return $q.when(details);
 		}
 	};
 }]);
+
+})(angular);

@@ -1,6 +1,7 @@
 /*!
  * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
  */
+(function(angular) {
 
 'use strict';
 
@@ -38,14 +39,6 @@ angular.module('explorer.popover', [])
 		}
 	
 	};
-}])
-
-.run(["$templateCache", function($templateCache) {
-	  $templateCache.put("components/popover/popover.html", 
-		'<div class="popover {{direction}}" ng-class="containerClass" ng-show="show">' +
-		'  <div class="arrow"></div>' +
-		'  <div class="popover-inner" ng-transclude></div>' +
-		'</div>'
-	  );
 }]);
 
+})(angular);

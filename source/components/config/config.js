@@ -65,7 +65,7 @@ angular.module("explorer.config", ['explorer.httpdata', 'explorer.waiting'])
 							function decorateAndResolve() {
 								persistedConfig = config;
 								config.localClientSessionId = config.clientSessionId + "-" + now;
-								waiters.resolve(config)
+								waiters.resolve(config);
 								// Clean it up.
 								waiters = null;
 							}							

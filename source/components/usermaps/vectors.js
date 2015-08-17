@@ -1,7 +1,7 @@
 /*!
  * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
  */
-
+(function(angular, OpenLayers, XMLSerializer) {
 'use strict';
 
 angular.module("explorer.vector", ['explorer.flasher', 'explorer.broker', 'explorer.persist.local', 'explorer.message', 'explorer.config'])
@@ -59,7 +59,9 @@ angular.module("explorer.vector", ['explorer.flasher', 'explorer.broker', 'explo
 			};
 		}
 	};
-}]).directive("vectorsDisplay", ['vectorService', function(vectorService) {
+}])
+
+.directive("vectorsDisplay", ['vectorService', function(vectorService) {
 	return {
 		templateUrl : "components/usermaps/vectorDisplay.html?v=1",
 		restrict : "AE",
@@ -74,15 +76,15 @@ angular.module("explorer.vector", ['explorer.flasher', 'explorer.broker', 'explo
 			};
 			
 			scope.isPath = function() {
-				return this.vector.layer && this.vector.layer.features 
-					&& this.vector.layer.features.length == 1 && this.vector.layer.features[0].geometry 
-					&& this.vector.layer.features[0].geometry.CLASS_NAME == "OpenLayers.Geometry.LineString";
+				return this.vector.layer && this.vector.layer.features && 
+					this.vector.layer.features.length == 1 && this.vector.layer.features[0].geometry && 
+					this.vector.layer.features[0].geometry.CLASS_NAME == "OpenLayers.Geometry.LineString";
 			};
 			
 			scope.isFeaturePath = function() {
-				return this.feature.geometry 
-					&& (this.feature.geometry.CLASS_NAME == "OpenLayers.Geometry.LineString"
-						|| this.feature.geometry.CLASS_NAME == "OpenLayers.Geometry.MultiLineString");
+				return this.feature.geometry && 
+					(this.feature.geometry.CLASS_NAME == "OpenLayers.Geometry.LineString" || 
+							this.feature.geometry.CLASS_NAME == "OpenLayers.Geometry.MultiLineString");
 			};
 			
 			scope.toggle = function() {
@@ -115,7 +117,9 @@ angular.module("explorer.vector", ['explorer.flasher', 'explorer.broker', 'explo
 			};
 		}
 	};
-}]).directive("ajaxForm", ['flashService', '$rootScope', 'asynch', 'configService', function(flashService, $rootScope, asynch, configService){
+}])
+
+.directive("ajaxForm", ['flashService', '$rootScope', 'asynch', 'configService', function(flashService, $rootScope, asynch, configService){
 	return {
 		scope : {
 			update : "&",
@@ -150,8 +154,10 @@ angular.module("explorer.vector", ['explorer.flasher', 'explorer.broker', 'explo
 		        return oSerializer.serializeToString(node);
 		    }
 		}
-	}
-}]).service("vectorService", ['mapService', 'persistService', '$q', '$rootScope', function(mapService, persistService, $q, $rootScope){
+	};
+}])
+
+.service("vectorService", ['mapService', 'persistService', '$q', '$rootScope', function(mapService, persistService, $q, $rootScope){
 	var PERSIST_KEY = "userVectorLayers",
 		vectors = {}, map,
 		gmlns = "http://www.opengis.net/gml",
@@ -205,7 +211,8 @@ angular.module("explorer.vector", ['explorer.flasher', 'explorer.broker', 'explo
 		
 		restore : function() {
 			var self = this,
-			 	deferred = $q.defer();;
+			 	deferred = $q.defer();
+			
 			mapService.getMap().then(function(map) {
 				persistService.getItem(PERSIST_KEY).then(function(layers) {
 					var response = {};
@@ -298,3 +305,5 @@ angular.module("explorer.vector", ['explorer.flasher', 'explorer.broker', 'explo
 		}
 	};
 }]);
+
+})(angular, OpenLayers, XMLSerializer);

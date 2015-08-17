@@ -16,9 +16,9 @@
     "type": "git",
     "url": "https://github.com/GeoscienceAustralia/explorer-ui-components"
   },
-  "dependencies": {
-  },
+  "dependencies": {},
   "devDependencies": {
+    "add-stream": "^1.0.0",
     "gulp": "^3.8.11",
     "gulp-angular-templatecache": "^1.6.0",
     "gulp-concat": "^2.5.2",

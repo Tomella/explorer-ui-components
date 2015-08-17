@@ -1,5 +1,10 @@
+
 <span ng-controller="MessageController" style="z-index:3">
-	<div ng-show="message" class="alert" role="alert" ng-class='{"alert-success":(message.type=="success"),"alert-info":(message.type=="info"),"alert-warning":(message.type=="warn"),"alert-danger":(message.type=="error")}'>
-		{{message.text}} <a href="javascript:;" ng-click="removeMessage()"><i class="fa fa-times-circle" style="font-size:120%"></i></a> 
-	</div>
+  <span ng-show="historic.length > 10000">
+    <a href="javascript:;" title="Show recent messages"><i class="fa fa-comments-o" style="color:black"></i></a>
+  </span>
+  <div ng-show="message" class="alert" role="alert" 
+  		ng-class='{"alert-success":(message.type=="success"),"alert-info":(message.type=="info"),"alert-warning":(message.type=="warn"),"alert-danger":(message.type=="error")}'>
+    {{message.text}} <a href="javascript:;" ng-click="removeMessage()"><i class="fa fa-times-circle" style="font-size:120%"></i></a>
+  </div>
 </div>

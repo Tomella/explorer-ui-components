@@ -9,6 +9,7 @@ var concatCss     = require('gulp-concat-css');
 var uglify        = require('gulp-uglify');
 var rename        = require('gulp-rename');
 var templateCache = require('gulp-angular-templatecache');
+var addStream     = require('add-stream');
 
 // Lint Task
 gulp.task('lint', function() {
@@ -24,20 +25,15 @@ gulp.task('lint', function() {
 //         .pipe(gulp.dest('css'));
 // });
 
-// Concatenate & Minify JS
+//Concatenate & Minify JS
 gulp.task('scripts', function() {
-    return gulp.src('source/components/**/*.js')
-        .pipe(concat('source/components/ga-ui-components.js'))
-        .pipe(gulp.dest('dist'))
-        .pipe(rename('ga-ui-components.min.js'))
-        .pipe(uglify())
-        .pipe(gulp.dest('dist'));
-});
-
-gulp.task('templates', function() {
-    gulp.src('source/components/**/*.html')
-        .pipe(templateCache({root:"components", module:"exp.ui.templates", standalone : true}))
-        .pipe(gulp.dest('dist'));
+ return gulp.src('source/components/**/*.js')
+ 	 .pipe(addStream.obj(prepareTemplates()))
+     .pipe(concat('ga-explorer-ui-components.js'))
+     .pipe(gulp.dest('dist'))
+     .pipe(rename('ga-explorer-ui-components.min.js'))
+     .pipe(uglify())
+     .pipe(gulp.dest('dist'));
 });
 
 // Watch Files For Changes
@@ -51,9 +47,15 @@ gulp.task('watch', function() {
 
 gulp.task('concatCss', function () {
   return gulp.src('source/components/**/*.css')
-    .pipe(concatCss("ga-ui-components.css"))
+    .pipe(concatCss("ga-explorer-ui-components.css"))
     .pipe(gulp.dest('dist/'));
 });
 
 // Default Task
-gulp.task('default', ['lint', 'scripts', 'templates', 'concatCss', 'watch']);
+gulp.task('default', ['lint', 'scripts', 'concatCss', 'watch']);
+
+function prepareTemplates() {
+   return gulp.src('source/components/**/*.html')
+      .pipe(templateCache({root:"components", module:"exp.ui.templates", standalone : true}));
+}
+

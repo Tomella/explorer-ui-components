@@ -1,6 +1,7 @@
 /*!
  * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
  */
+(function($, window, angular) {
 
 'use strict';
 
@@ -30,3 +31,5 @@ angular.module("explorer.height.delta", [])
 		}
 	};
 }]);
+
+})($, window, angular);

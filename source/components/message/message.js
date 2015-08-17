@@ -1,6 +1,7 @@
 /*!
  * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
  */
+(function(angular) {
 
 'use strict';
 
@@ -77,8 +78,7 @@ angular.module("explorer.message", [])
 			$scope.historic.pop();
 		}
 		$scope.message = null;
-	}
-	
+	};	
 }])
 
 .run(['$rootScope', 'messageService',  
@@ -96,7 +96,7 @@ angular.module("explorer.message", [])
     $rootScope.$on("message:warn", function (event, message) {
         messageService.warn(message);
     });
-    $rootScope.$on("message:clear", function () {
+    $rootScope.$on("message:clear", function (message) {
         messageService.warn(message);
     });
     $rootScope.$on("messages", function (event, messages) {
@@ -105,16 +105,6 @@ angular.module("explorer.message", [])
     		$rootScope.$broadcast("message:" + message.type.toLowerCase(), message.text);
     	}); 
     });
-}])
-
-.run(["$templateCache", function($templateCache) {
-	$templateCache.put("components/message/messages.html",
-			    '<span ng-controller="MessageController" style="z-index:3">' +
-				'  <span ng-show="historic.length > 10000">' +
-				'    <a href="javascript:;" title="Show recent messages"><i class="fa fa-comments-o" style="color:black"></i></a>' +
-				'  </span>' +
-				'  <div ng-show="message" class="alert" role="alert" ng-class=\'{"alert-success":(message.type=="success"),"alert-info":(message.type=="info"),"alert-warning":(message.type=="warn"),"alert-danger":(message.type=="error")}\'>' +
-				'    {{message.text}} <a href="javascript:;" ng-click="removeMessage()"><i class="fa fa-times-circle" style="font-size:120%"></i></a>' +
-				'  </div>' +
-				'</div>');
 }]);
+
+})(angular);

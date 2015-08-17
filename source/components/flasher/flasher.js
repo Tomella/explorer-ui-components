@@ -2,6 +2,8 @@
  * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
  */
 
+(function(angular) {
+
 'use strict';
 
 angular.module("explorer.flasher", [])
@@ -67,13 +69,6 @@ angular.module("explorer.flasher", [])
 			element.addClass("marsFlash");
 		}
 	};
-}])
-
-.run(["$templateCache", function($templateCache) {
-	  $templateCache.put("components/flasher/flash.html",
-			    '<div class="marsFlash" ng-show="messages.items.length > 0">' +
-				'  <div ng-repeat="message in messages.items">' +
-				'     <span><img alt="Waiting..." src="resources/img/tinyloader.gif" ng-show="message.spinner" style="position:relative;top:2px;" width="12"></img> {{message.text}}</span>'+
-				'  </div>' +
-				'</div>');
 }]);
+
+})(angular);

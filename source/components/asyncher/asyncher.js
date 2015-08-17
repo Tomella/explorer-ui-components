@@ -166,7 +166,7 @@ angular.module("explorer.asynch", [])
 				}
 			);	
 			return deferred.promise;
-		};
+		}
 		
 		$asynch.setBroker = function(handler) {
 			brokerHandler = handler;

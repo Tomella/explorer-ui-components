@@ -1,211 +1,34 @@
-
 @charset "utf-8";
 
-
-.ga_headerPane
-{
-    position:relative;
-    width:100%;
-    height:52px;
-    border: solid 0px;
-    background-color:black;
-    overflow:hidden;
-}
-
-.ga_headerPane img
-{
-    border:0px;
-}
-
-.ga_headerPane .ga_maplinks img
-{
-    margin-left:3px;
-}
-
-.ga_maplinkPaneHeaderPos
-{
-    position:absolute;
-    top:0px;
-    right:35px;
-}
-
-.ga_headerPane .ga_helpbutton
-{
-    position:absolute;
-    top:25px;
-    right:3px;
-    cursor:pointer;
-    z-index:2000;
-}
-
-
-.ga_headerPane .ga_topoheaderlink
-{
-    position:absolute;
-    top:5px;
-    left:180px;
-    padding:0px;
-    padding-left:10px;
-    z-index:1000;
-}
-
-.ga_headerPane .ga_topoheaderlink a
-{
-    font-size:11px;
-    font-style:normal;
-    line-height:normal;
-    font-weight:normal;
-    color:white;
-    text-align:left;
-    text-decoration: underline;
-}
-
-.ga_crestheaderimg
-{
-    position:absolute;
-    top:0px;
-    left:0px;
-    z-index:200;
-    cursor:pointer;
-}
-
-
-.ga_headerPane #nav {
-    clear: right;
-    display: inline;
-    list-style: none outside none;
-    margin: 0;
-    padding: 0;
-    width: auto;
-    z-index: 10;
-}
-.ga_headerPane #nav li {
-    background-image: url(../images/ga.header.crumbs.png);
-    background-position: right center;
-    background-repeat: no-repeat;
-    display: inline;
-    float: left;
-    font: 1em/1.2 Helvetica,Arial,Verdana,sans-serif;
-    margin: 0;
-    padding: 0 18px 0 0;
-}
-.ga_headerPane #nav li a {
-    color: #FFFFFF;
-    display: block;
-    float: left;
-    height: 1%;
-    margin: 0;
-    padding: 0px 0px !important;
-    background-image: url(../images/black_20.png);background-repeat:repeat;
-}
-
-
-@media screen and (max-width: 480px) {
-.search-box {
-    width: 90%;
-}
-.search-button {
-    float: left;
-    margin-right: 4px;
-}
-#help {
-    float: right;
-    margin: 2px 0 0 30px;
-}
-#footer #footer-nav {
-    display: list-item;
-}
-#footer #footer-nav li a {
-    display: list-item;
-    padding: 0.5em 0;
-}
-}
-@media screen and (min-width: 480px) and (max-width: 767px) {
-#app-info {
-    float: right;
-    left: 200px;
-    position: absolute;
-    top: 0;
-}
-}
-@media screen and (max-width: 768px) {
-H1.app-name {
-    font-size: 1.1em;
-}
-#header-right {
-    margin: 0 0 5px;
-}
-}
 @media screen and (min-width: 480px) {
-.breadcrumbs {
-    margin-top: 3px;
+	.breadcrumbs {
+    	margin-top: 3px;
+	}
 }
-.search-button {
-    margin-right: 10px;
-}
-#help {
-    margin-left: 30px;
-}
-#footer #footer-nav {
-    clear: right;
-    display: inline;
-    padding: 0;
-    width: auto;
-    z-index: 10;
-}
-#footer #footer-nav li a {
-    display: block;
-    float: left;
-}
-}
-@media screen and (min-width: 768px) {
-#header-right {
-    padding-top: 22px;
-}
-}
+
 @media screen and (min-width: 768px) and (max-width: 960px) {
-H1.app-name {
-    font-size: 1.05em;
+	.breadcrumbs {
+    	padding: 0;
+	}
 }
-.breadcrumbs {
-    padding: 0;
-}
-}
-@media screen and (min-width: 960px) {
-H1.app-name {
-    font-size: 1.3em;
-}
-.header {
-    margin: 0 auto;
-    width: 100%;
-}
-.heading {
-    margin-left: 15px;
-}
-}
-H1.app-name {
-    color: #006983;
-    font-family: Arial,Helvetica,sans-serif;
-    font-weight: bold;
-    margin-top: 0.9em;
-}
+
 a {
     cursor: pointer;
 }
-.header {
-    margin: 0 auto;
-    width: 100%;
-}
+
 #logo {
     margin-left: 0;
     padding-left: 0;
 }
+
 img.logo {
     width: 180px;
 }
+
 img.logo-stacked {
     width: 106px;
 }
+
 .breadcrumbs {
     display: inline;
     font-size: 0.7em;
@@ -213,67 +36,38 @@ img.logo-stacked {
     padding: 0;
     z-index: 10;
 }
+
 .breadcrumbsContainer {
     margin-left: 184px;
     position: absolute;
     width: 100%;
 }
+
 .breadcrumbs li a, .breadcrumbs li.last {
     background: url('data:image/gif;base64,R0lGODlhBQAJAJEAAP//wd///35aoP///yH/C1hNUCBEYXRhWE1QPD94cGFja2V0IGJlZ2luPSLvu78iIGlkPSJXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQiPz4gPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyIgeDp4bXB0az0iQWRvYmUgWE1QIENvcmUgNS4wLWMwNjAgNjEuMTM0Nzc3LCAyMDEwLzAyLzEyLTE3OjMyOjAwICAgICAgICAiPiA8cmRmOlJERiB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiPiA8cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0iIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtbG5zOnhtcE1NPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvbW0vIiB4bWxuczpzdFJlZj0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL3NUeXBlL1Jlc291cmNlUmVmIyIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ1M1IFdpbmRvd3MiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6QzJBOTA1NEZFMEE2MTFFM0JCMkQ5NUJEOTU5QUQ1RDQiIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6QzJBOTA1NTBFMEE2MTFFM0JCMkQ5NUJEOTU5QUQ1RDQiPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDpDMkE5MDU0REUwQTYxMUUzQkIyRDk1QkQ5NTlBRDVENCIgc3RSZWY6ZG9jdW1lbnRJRD0ieG1wLmRpZDpDMkE5MDU0RUUwQTYxMUUzQkIyRDk1QkQ5NTlBRDVENCIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/PgH//v38+/r5+Pf29fTz8vHw7+7t7Ovq6ejn5uXk4+Lh4N/e3dzb2tnY19bV1NPS0dDPzs3My8rJyMfGxcTDwsHAv769vLu6ubi3trW0s7KxsK+urayrqqmop6alpKOioaCfnp2cm5qZmJeWlZSTkpGQj46NjIuKiYiHhoWEg4KBgH9+fXx7enl4d3Z1dHNycXBvbm1sa2ppaGdmZWRjYmFgX15dXFtaWVhXVlVUU1JRUE9OTUxLSklIR0ZFRENCQUA/Pj08Ozo5ODc2NTQzMjEwLy4tLCsqKSgnJiUkIyIhIB8eHRwbGhkYFxYVFBMSERAPDg0MCwoJCAcGBQQDAgEAACH5BAAAAAAALAAAAAAFAAkAAAIMHBRjqJf7XGNwRlYAADs=') no-repeat scroll right center rgba(0, 0, 0, 0);
     float: left;
     padding-right: 0;
 }
+
 .breadcrumbs li a {
     color: #006983;
     padding: 0 10px;
 }
+
 .breadcrumbs li.first a {
     padding-left: 0;
     padding-right: 10px;
 }
+
 .breadcrumbs li.last, .breadcrumbs li.last a {
     background: none repeat scroll 0 0 rgba(0, 0, 0, 0);
     color: #5e6a71;
 }
-#quick-links button {
-    float: right;
-    margin-top: 19px;
-    padding-right: 20px;
-}
-#search {
-    display: block;
-    height: 100%;
-    margin: auto 0;
-    vertical-align: middle;
-}
-.search-box {
-    color: #a3a3a3;
-    float: left;
-    font-size: 0.8em;
-    height: 22px;
-    margin: 0;
-}
-.search-button {
-    float: left;
-}
+
 .navbar-right {
     margin-top: 30px;
 }
-.advanced a {
-    color: #5e6a71;
-    display: block;
-    float: left;
-    font-size: 0.8em;
-    font-weight: bold;
-    margin: 3px 0 0 1px;
-}
-#help {
-    float: left;
-}
-#help img {
-    padding-top: 2px;
-    width: 80%;
-}
+
 .appTitle {
     color: #777;
     font-weight: bold;

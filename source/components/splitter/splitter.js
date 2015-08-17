@@ -1,6 +1,7 @@
 /*!
  * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
  */
+(function($, angular) {
 
 'use strict';
 
@@ -68,7 +69,7 @@ angular.module('mars.splitter', [])
 						
 						// Workaround for kendo not re-sizing stuff properly once the splitter is dragged.
 						//event.sender.element.height("").css("height", "100%").find("> div").height("").css("height", "100%");
-						self.map && self.map.updateSize();
+						// self.map && self.map.updateSize();
 					}, 0);
 				}
 			});
@@ -133,9 +134,6 @@ angular.module('mars.splitter', [])
 		$scope.pinnedLeft = value;
 	});
 
-	$scope.remove = function() {
-		remove(this.feature);				
-	};
 		
 	$scope.toggleShow = function(element) {
 		if(!element) {
@@ -148,3 +146,5 @@ angular.module('mars.splitter', [])
 		//console.log(feature);
 	};
 }]);
+
+})($, angular);

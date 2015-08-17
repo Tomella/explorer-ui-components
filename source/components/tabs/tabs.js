@@ -23,7 +23,10 @@
  * 
  * 
  */
-
+(function(angular) {
+'use strict';
+	
+	
 angular.module('explorer.tabs', [])
 
 .controller("tabsController", ['$scope', '$document', function($scope, $document) {
@@ -79,6 +82,8 @@ angular.module('explorer.tabs', [])
 	
 	$scope.callback = function() {
 		//console.log("Calling back")
-	}
+	};
 	
 }]);
+
+})(angular);

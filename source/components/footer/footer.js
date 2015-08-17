@@ -1,6 +1,7 @@
 /*!
  * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
  */
+(function(angular) {
 
 'use strict';
 
@@ -75,7 +76,7 @@ angular.module('page.footer', [])
 			});
 
 			element.on("mouseleave", function() {
-				if(scope.timeout != null) {
+				if(scope.timeout !== null) {
 					$timeout.cancel(scope.timeout);
 					scope.timeout = null;
 				} else {
@@ -86,3 +87,6 @@ angular.module('page.footer', [])
 		}
 	};
 }]);
+
+
+})(angular);

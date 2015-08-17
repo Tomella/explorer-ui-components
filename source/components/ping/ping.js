@@ -1,3 +1,10 @@
+/*!
+ * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
+ */
+
+(function(angular) {
+	
+
 'use strict';
 
 angular.module("explorer.ping", [])
@@ -10,16 +17,16 @@ angular.module("explorer.ping", [])
 
 	this.location = function(where) {
 		url = where;
-	}
+	};
 
 	this.enable = function(value) {
 		enabled = value;
-	}
+	};
 	
 	this.$get = ['$http', '$timeout', function pingServiceFactory($http, $timeout) {
 		var $ping = {
 			enable :function(value) {
-				enable(value);
+				enabled = value;
 			},
 			
 			period : function(delay) { 
@@ -41,3 +48,5 @@ angular.module("explorer.ping", [])
 	}];
 	
 });
+
+})(angular);

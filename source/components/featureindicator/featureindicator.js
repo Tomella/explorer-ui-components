@@ -16,7 +16,10 @@ angular.module('explorer.feature.indicator', ['explorer.projects'])
 	return {		
 		
 		checkImpact : function(extents) {
-			var deferred, startTime = lastTime = new Date();
+			var deferred, startTime;
+			
+			startTime = lastTime = new Date();
+			
 			if(lastPromise) {
 				// Get rid of the last one as it is usurped. 
 				lastPromise.resolve(null);

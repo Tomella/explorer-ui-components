@@ -1,6 +1,7 @@
 /*!
  * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
  */
+(function(angular, window) {
 
 'use strict';
 
@@ -76,3 +77,5 @@ angular.module('explorer.httpinterceptors.authentication', [])
     //configure $http to show a login dialog whenever a 401 unauthorized response arrives
 	$httpProvider.interceptors.push('expHttpInterceptor');
 }]);
+
+})(angular, window);

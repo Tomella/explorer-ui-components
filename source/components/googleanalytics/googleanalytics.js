@@ -1,3 +1,8 @@
+/*!
+ * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
+ */
+(function(angular) {
+
 'use strict';
 
 angular.module('explorer.googleanalytics', [])
@@ -22,7 +27,7 @@ angular.module('explorer.googleanalytics', [])
     	    	ga(scope.expGa);
     		}
 		}
-    }
+    };
 }])
 
 .factory('ga', ['$log', '$window', function ($log, $window) {
@@ -35,3 +40,5 @@ angular.module('explorer.googleanalytics', [])
     	}
     };
 }]);
+
+})(angular);

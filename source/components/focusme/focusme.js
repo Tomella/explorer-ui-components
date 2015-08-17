@@ -2,6 +2,8 @@
  * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
  */
 
+(function(angular) {
+	
 'use.strict';
 
 angular.module("explorer.focusme", [])
@@ -11,9 +13,13 @@ angular.module("explorer.focusme", [])
 		link: function(scope, element, attrs) {
             attrs.$observe("focusMe", function(newValue) {
                 if (newValue === "true") {
-                    $timeout(function(){element.focus()});
+                    $timeout(function(){
+                    	element.focus();
+                    });
                 }
             });
 		}
 	};
 }]);
+
+})(angular);

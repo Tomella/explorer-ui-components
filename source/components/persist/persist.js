@@ -1,13 +1,14 @@
 /*!
  * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
  */
+(function(angular, sessionStorage) {
 
 'use strict';
 
 angular.module("explorer.persist", ['explorer.projects'])
 
 .provider("persistService", function PersistServiceProvider() { 
-	var handle = null
+	var handle = null;
 
 	this.$get = ['persistLocalService', 'persistRemoteService', function(persistLocalService, persistRemoteService) {
 		if(handle == "local") {
@@ -19,7 +20,7 @@ angular.module("explorer.persist", ['explorer.projects'])
 		
 	this.handler = function(name) {
 		handle = name;
-	}	
+	};
 })
 
 .factory("persistRemoteService", ['$log', '$q', 'projectsService', 'serverPersistService', 'userService', function($log, $q, projectsService, serverPersistService, userService) {
@@ -83,7 +84,7 @@ angular.module("explorer.persist", ['explorer.projects'])
 	};
 }])
 
-.factory("serverPersistService", ['httpData', 'projectsService', 'userService', '$q', function(httpData, projectsService, userService, $q) {
+.factory("serverPersistService", ['$log', 'httpData', 'projectsService', 'userService', '$q', function($log, httpData, projectsService, userService, $q) {
 	function parse(item) {
 		if(!item) {
 			// return falsy stuff
@@ -95,7 +96,7 @@ angular.module("explorer.persist", ['explorer.projects'])
 			}
 			return JSON.parse(item);
 		} catch(e) {
-			$log.debug("Returning original item: " + item)
+			$log.debug("Returning original item: " + item);
 			return item;
 		}		
 	}	
@@ -119,7 +120,7 @@ angular.module("explorer.persist", ['explorer.projects'])
 		retrieve : function(project, key) {
 			return httpData.get("service/state/item/" + project + "/" + key);
 		}
-	}
+	};
 }])
 
 .factory("persistLocalService", ['$log', '$q', 'projectsService', function($log, $q, projectsService) {
@@ -167,3 +168,5 @@ angular.module("explorer.persist", ['explorer.projects'])
 		}		
 	};
 }]);
+
+})(angular, localStorage, sessionStorage);

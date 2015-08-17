@@ -50,212 +50,20 @@ button.undecorated {
 }
 @charset "utf-8";
 
-.ga_headerPane {
-  position: relative;
-  width: 100%;
-  height: 52px;
-  border: solid 0px;
-  background-color: black;
-  overflow: hidden;
-}
-
-.ga_headerPane img {
-  border: 0px;
-}
-
-.ga_headerPane .ga_maplinks img {
-  margin-left: 3px;
-}
-
-.ga_maplinkPaneHeaderPos {
-  position: absolute;
-  top: 0px;
-  right: 35px;
-}
-
-.ga_headerPane .ga_helpbutton {
-  position: absolute;
-  top: 25px;
-  right: 3px;
-  cursor: pointer;
-  z-index: 2000;
-}
-
-.ga_headerPane .ga_topoheaderlink {
-  position: absolute;
-  top: 5px;
-  left: 180px;
-  padding: 0px;
-  padding-left: 10px;
-  z-index: 1000;
-}
-
-.ga_headerPane .ga_topoheaderlink a {
-  font-size: 11px;
-  font-style: normal;
-  line-height: normal;
-  font-weight: normal;
-  color: white;
-  text-align: left;
-  text-decoration: underline;
-}
-
-.ga_crestheaderimg {
-  position: absolute;
-  top: 0px;
-  left: 0px;
-  z-index: 200;
-  cursor: pointer;
-}
-
-.ga_headerPane #nav {
-  clear: right;
-  display: inline;
-  list-style: none outside none;
-  margin: 0;
-  padding: 0;
-  width: auto;
-  z-index: 10;
-}
-
-.ga_headerPane #nav li {
-  background-image: url("images/ga.header.crumbs.png");
-  background-position: right center;
-  background-repeat: no-repeat;
-  display: inline;
-  float: left;
-  font: 1em/1.2 Helvetica,Arial,Verdana,sans-serif;
-  margin: 0;
-  padding: 0 18px 0 0;
-}
-
-.ga_headerPane #nav li a {
-  color: #FFFFFF;
-  display: block;
-  float: left;
-  height: 1%;
-  margin: 0;
-  padding: 0px 0px !important;
-  background-image: url("images/black_20.png");
-  background-repeat: repeat;
-}
-
-@media screen and (max-width: 480px) {
-  .search-box {
-    width: 90%;
-  }
-
-  .search-button {
-    float: left;
-    margin-right: 4px;
-  }
-
-  #help {
-    float: right;
-    margin: 2px 0 0 30px;
-  }
-
-  #footer #footer-nav {
-    display: list-item;
-  }
-
-  #footer #footer-nav li a {
-    display: list-item;
-    padding: 0.5em 0;
-  }
-}
-
-@media screen and (min-width: 480px) and (max-width: 767px) {
-  #app-info {
-    float: right;
-    left: 200px;
-    position: absolute;
-    top: 0;
-  }
-}
-
-@media screen and (max-width: 768px) {
-  H1.app-name {
-    font-size: 1.1em;
-  }
-
-  #header-right {
-    margin: 0 0 5px;
-  }
-}
-
 @media screen and (min-width: 480px) {
   .breadcrumbs {
     margin-top: 3px;
   }
-
-  .search-button {
-    margin-right: 10px;
-  }
-
-  #help {
-    margin-left: 30px;
-  }
-
-  #footer #footer-nav {
-    clear: right;
-    display: inline;
-    padding: 0;
-    width: auto;
-    z-index: 10;
-  }
-
-  #footer #footer-nav li a {
-    display: block;
-    float: left;
-  }
-}
-
-@media screen and (min-width: 768px) {
-  #header-right {
-    padding-top: 22px;
-  }
 }
 
 @media screen and (min-width: 768px) and (max-width: 960px) {
-  H1.app-name {
-    font-size: 1.05em;
-  }
-
   .breadcrumbs {
     padding: 0;
   }
 }
 
-@media screen and (min-width: 960px) {
-  H1.app-name {
-    font-size: 1.3em;
-  }
-
-  .header {
-    margin: 0 auto;
-    width: 100%;
-  }
-
-  .heading {
-    margin-left: 15px;
-  }
-}
-
-H1.app-name {
-  color: #006983;
-  font-family: Arial,Helvetica,sans-serif;
-  font-weight: bold;
-  margin-top: 0.9em;
-}
-
 a {
   cursor: pointer;
-}
-
-.header {
-  margin: 0 auto;
-  width: 100%;
 }
 
 #logo {
@@ -308,51 +116,8 @@ img.logo-stacked {
   color: #5e6a71;
 }
 
-#quick-links button {
-  float: right;
-  margin-top: 19px;
-  padding-right: 20px;
-}
-
-#search {
-  display: block;
-  height: 100%;
-  margin: auto 0;
-  vertical-align: middle;
-}
-
-.search-box {
-  color: #a3a3a3;
-  float: left;
-  font-size: 0.8em;
-  height: 22px;
-  margin: 0;
-}
-
-.search-button {
-  float: left;
-}
-
 .navbar-right {
   margin-top: 30px;
-}
-
-.advanced a {
-  color: #5e6a71;
-  display: block;
-  float: left;
-  font-size: 0.8em;
-  font-weight: bold;
-  margin: 3px 0 0 1px;
-}
-
-#help {
-  float: left;
-}
-
-#help img {
-  padding-top: 2px;
-  width: 80%;
 }
 
 .appTitle {
@@ -743,6 +508,23 @@ img.logo-stacked {
 .split-panes {
   background: #FFF;
 }
+.addMapsDialog label {
+  width: 8em;
+}
+
+.addMapsDialog input,
+.addMapsDialog textarea {
+  width: 20em;
+}
+
+.addMapsDialog textarea {
+  height: 3em;
+}
+
+.addMapButtons .btn.btn-default {
+  width: 6em;
+  margin: 2px;
+}
 .tabs-left-main {
   position: absolute;
   top: 0px;
@@ -827,21 +609,4 @@ img.logo-stacked {
 
 .split-panes {
   background: #FFF;
-}
-.addMapsDialog label {
-  width: 8em;
-}
-
-.addMapsDialog input,
-.addMapsDialog textarea {
-  width: 20em;
-}
-
-.addMapsDialog textarea {
-  height: 3em;
-}
-
-.addMapButtons .btn.btn-default {
-  width: 6em;
-  margin: 2px;
 }

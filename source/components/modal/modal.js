@@ -1,6 +1,7 @@
 /*!
  * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
  */
+(function(angular) {
 
 'use strict';
 
@@ -30,12 +31,12 @@ angular.module("explorer.modal", [])
     		scope.$watch("isOpen", function(newValue, oldValue) {
     			var extent;
     			if(newValue) {
-    				element.css("zIndex", modalService.index())
+    				element.css("zIndex", modalService.index());
     				element.on('keyup', keyupHandler);
     			} else {
     				element.off('keyup', keyupHandler);
     				if(newValue != oldValue) {
-    					modalService.closed()
+    					modalService.closed();
     					scope.onClose();
     				}
     			}
@@ -78,7 +79,7 @@ angular.module("explorer.modal", [])
 	
 	return {
 		index : function() {
-			if(opened == 0) {
+			if(opened === 0) {
 				count = COUNT_START;
 			}
 			opened++;
@@ -90,5 +91,7 @@ angular.module("explorer.modal", [])
 				opened = 0;
 			}
 		}
-	}
+	};
 }]);
+
+})(angular);
