@@ -1,0 +1,24 @@
+{
+  "name": "explorer-ui-components",
+  "version": "0.0.0",
+  "description": "UI components to support Geoscience Australia Explorer like apps.",
+  "keywords": [
+    "angularjs"
+  ],
+  "repository" : {
+  	"type" : "git",
+  	"url" : "git://github.com/GeoscienceAustralia/explorer-ui-components.git"
+  },
+  "authors": [
+    "Geoscience Australia"
+  ],
+  "license": "https://raw.githubusercontent.com/GeoscienceAustralia/explorer-ui-components/master/LICENCE",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
