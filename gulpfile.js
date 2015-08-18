@@ -29,9 +29,9 @@ gulp.task('lint', function() {
 gulp.task('scripts', function() {
  return gulp.src('source/components/**/*.js')
  	 .pipe(addStream.obj(prepareTemplates()))
-     .pipe(concat('ga-explorer-ui-components.js'))
+     .pipe(concat('ga-explorer-ui.js'))
      .pipe(gulp.dest('dist'))
-     .pipe(rename('ga-explorer-ui-components.min.js'))
+     .pipe(rename('ga-explorer-ui.min.js'))
      .pipe(uglify())
      .pipe(gulp.dest('dist'));
 });
@@ -47,7 +47,7 @@ gulp.task('watch', function() {
 
 gulp.task('concatCss', function () {
   return gulp.src('source/components/**/*.css')
-    .pipe(concatCss("ga-explorer-ui-components.css"))
+    .pipe(concatCss("ga-explorer-ui.css"))
     .pipe(gulp.dest('dist/'));
 });
 
