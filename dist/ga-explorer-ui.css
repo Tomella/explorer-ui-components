@@ -593,20 +593,3 @@ img.logo-stacked {
 .split-panes {
   background: #FFF;
 }
-.addMapsDialog label {
-  width: 8em;
-}
-
-.addMapsDialog input,
-.addMapsDialog textarea {
-  width: 20em;
-}
-
-.addMapsDialog textarea {
-  height: 3em;
-}
-
-.addMapButtons .btn.btn-default {
-  width: 6em;
-  margin: 2px;
-}
