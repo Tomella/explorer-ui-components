@@ -8,7 +8,7 @@
 
 angular.module('explorer.assets', ['explorer.projects'])
 
-.factory('assetsService', ['$log', '$http', '$q', 'projectsService', '$timeout', function($log, $http, $q, projectsService, $timeout) {
+.factory('assetsService', ['$log', '$q', 'httpData', 'projectsService', '$timeout', function($log, $q, httpData, projectsService, $timeout) {
 	var assets,
 	promises = [],
 	baseUrl = "service/asset/assets/",
@@ -20,8 +20,8 @@ angular.module('explorer.assets', ['explorer.projects'])
 		project = "Explorer";
 		
 		$log.debug(baseUrl + encodeURIComponent(project));
-		
-		$http.get(baseUrl + project + "?t=" + sessionTime, {cache:true}).success(function(response) {
+
+        httpData.get(baseUrl + project + "?t=" + sessionTime, {cache:true}).then(function(response) {
 			assets = response;
 			promises.forEach(function(promise) {
 				promise.resolve(assets);

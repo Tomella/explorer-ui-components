@@ -61,7 +61,7 @@ angular.module("nedf.splash", ['explorer.projects'])
 	};
 }])
 
-.factory("splashService", ['$http', '$q', 'projectsService', function($http, $q, projectsService) {
+.factory("splashService", ['httpData', 'projectsService', function(httpData, $q, projectsService) {
 	var VIEWED_SPLASH_KEY = "nedf.accepted.terms",
 		releaseNotesUrl = "service/releaseNotes/";
 		
@@ -69,11 +69,8 @@ angular.module("nedf.splash", ['explorer.projects'])
 		getReleaseNotes : function() {
 			var deferred = $q.defer();
 			projectsService.getCurrentProject().then(function(project) {
-				$http({
-					method : "GET",
-					url : releaseNotesUrl + project + "?t=" + Date.now()
-				}).then(function(result) {
-					deferred.resolve(result.data);
+				httpData.get(releaseNotesUrl + project + "?t=" + Date.now()).then(function(response) {
+					deferred.resolve(response && response.data);
 				});
 			});
 			return deferred.promise;

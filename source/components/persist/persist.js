@@ -103,7 +103,6 @@ angular.module("explorer.persist", ['explorer.projects'])
 	
 	return {
 		persist : function(project, key, obj) {
-			var deferred = $q.defer();
 			if(angular.isString()) {
 				try {
 					JSON.parse(obj);
@@ -111,14 +110,15 @@ angular.module("explorer.persist", ['explorer.projects'])
 					obj = '"' + obj + '"';
 				}
 			}
-			httpData.post("service/state/item/" + project + "/" + key, obj).then(function(response) {
-				deferred.resolve(response);
-			});
-			return deferred.promise;
+			return httpData.post("service/state/item/" + project + "/" + key, obj).then(function(response) {
+                return response && response.data;
+            });
 		},
 		
 		retrieve : function(project, key) {
-			return httpData.get("service/state/item/" + project + "/" + key);
+			return httpData.get("service/state/item/" + project + "/" + key).then(function(response) {
+                return response && response.data;
+            });
 		}
 	};
 }])

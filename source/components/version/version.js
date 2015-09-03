@@ -7,14 +7,14 @@
 
 angular.module("explorer.version", [])
 
-.directive('marsVersionDisplay', ['$http', 'versionService', function($http, versionService) {
+.directive('marsVersionDisplay', ['httpData', 'versionService', function(httpData, versionService) {
 	/**
 	 * CIAP theme switcher. Retrieves and stores the current theme to the theme service. 
 	 */
 	return {
 		templateUrl:'components/version/versionDisplay.html',
 		link : function(scope) {
-			$http.get(versionService.url()).then(function(response) {
+			httpData.get(versionService.url()).then(function(response) {
 				scope.version = response.data.version;
 			});
 		}

@@ -7,7 +7,7 @@
 
 angular.module('explorer.feature.indicator', ['explorer.projects'])
 
-.factory('indicatorService', ['$log', '$q', '$http', '$rootScope', 'projectsService', 'assetsService', function($log, $q, $http, $rootScope, projectsService, assetsService) {
+.factory('indicatorService', ['$log', '$q', '$rootScope', 'httpData', 'projectsService', 'assetsService', function($log, $q, $rootScope, httpData, projectsService, assetsService) {
 	// Maybe we should set up a configuration service
 	var url = "service/asset/counts",
 		lastPromise = null,
@@ -30,16 +30,17 @@ angular.module('explorer.feature.indicator', ['explorer.projects'])
 				// piggyback off explorer assets
 				project = "Explorer";
 
-				$http.post(url, {
+				httpData.post(url, {
 						wkt:extents,
 						md5:md5,
 						project:project
-				}).success(function (data, status) {
+				}).then(function (response) {
+                    var data = response.data, status = response.status;
 					// If a subsequent request has come in we don't want to update
 					// the counts but there is no cancel on a http request.
 					if(startTime == lastTime && data.refreshRequired) {
 						if(status == 200) {
-							assetsService.getAssets().then(function(assets) {	
+							assetsService.getAssets().then(function(assets) {
 								var countMap = data.countMap;
 								md5 = data.md5;
 								angular.forEach(assets, function(asset, key) {

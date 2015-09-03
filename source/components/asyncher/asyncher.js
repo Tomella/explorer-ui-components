@@ -61,19 +61,16 @@ angular.module("explorer.asynch", [])
 		fastPoll = millis;
 	};
 	
-	this.$get = ['$log', '$http', '$q', '$timeout', function($log, $http, $q, $timeout) {
+	this.$get = ['$log', '$q', '$timeout', 'httpData', function($log, $q, $timeout, httpData) {
 		// Get the polling running
 		timeout = $timeout(checkStatus, pollRate == "slow"?slowPoll:fastPoll);
 		function checkStatus(){
-			$http({
-				url: statusEndpoint, 
-				method : "post",
+			httpData.post(statusEndpoint, encodeParameters(namedParameters), {
 				headers : {
 					"Content-Type" : 'application/x-www-form-urlencoded'
-				},
-				data : encodeParameters(namedParameters)
-			}).then(function(response) {
-				var messages = response.data?(response.data.messages?response.data.messages:[]):[];
+				}
+            }).then(function(response) {
+				var messages = (response && response.data && response.data.messages) || [];
 				
 				expectCount--;
 				
@@ -137,13 +134,10 @@ angular.module("explorer.asynch", [])
 				postData = encodeParameters(postData);
 			}
 				
-			$http({
-				url: endpoint,
-				method : "post",
-				headers : headers,
-				data : postData
+			httpData.post(endpoint, postData, {
+				headers : headers
 			}).then(function(response) {
-					var headers = response.headers();
+					var headers = response.headers;
 					
 					if(noWait) {
 						deferred.resolve(response.data);
