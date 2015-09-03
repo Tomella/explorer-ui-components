@@ -23,7 +23,7 @@ angular.module("explorer.ping", [])
 		enabled = value;
 	};
 	
-	this.$get = ['$http', '$timeout', function pingServiceFactory($http, $timeout) {
+	this.$get = ['httpData', '$timeout', function pingServiceFactory(httpData, $timeout) {
 		var $ping = {
 			enable :function(value) {
 				enabled = value;
@@ -41,7 +41,7 @@ angular.module("explorer.ping", [])
 		
 		function ping() {
 			if(enabled) {
-				$http.post(url);
+                httpData.post(url);
 			}
 			timeout = $timeout(ping, delaySeconds * 1000);
 		}

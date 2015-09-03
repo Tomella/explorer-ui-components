@@ -11,7 +11,7 @@ angular.module("explorer.projects", [])
 .provider('projectsService', function ProjectsServiceProvider() { 
 	var currentProject = "<NONE>";
 
-	this.$get =  ['$q', '$timeout', '$http', function ($q, $timeout, $http) {
+	this.$get =  ['$q', '$timeout', 'httpData', function ($q, $timeout, httpData) {
 		var baseUrl = 'service/appConfig/projects?t=';
 	
 		return {
@@ -26,9 +26,8 @@ angular.module("explorer.projects", [])
 						deferred.resolve(this.projects);
 					}).bind(this));
 				}
-				$http.get(baseUrl + (new Date()).getTime()).then((function(response) {
-					this.projects = response;
-					deferred.resolve(this.projects);
+                httpData.get(baseUrl + (new Date()).getTime()).then((function(response) {
+					deferred.resolve(this.projects = response);
 				}).bind(this));
 			
 				return deferred.promise;

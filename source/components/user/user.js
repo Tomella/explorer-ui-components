@@ -41,7 +41,7 @@ angular.module("explorer.user", [])
 		baseUrl = where;
 	};
 
-	this.$get = ['$http', '$q', '$timeout', function($http, $q, $timeout) {
+	this.$get = ['httpData', '$q', '$timeout', function(httpData, $q, $timeout) {
 		var username;
 
 		function login() {
@@ -61,7 +61,7 @@ angular.module("explorer.user", [])
 		}
 
 		function loadCredentials() {
-			return $http.get(baseUrl + "?time=" + (new Date()).getTime());
+			return httpData.get(baseUrl + "?time=" + (new Date()).getTime());
 		}
 		
 		return {

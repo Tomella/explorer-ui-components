@@ -50,12 +50,14 @@ angular.module("explorer.config", ['explorer.httpdata', 'explorer.waiting'])
 					deferred = waiters.waiter();					
 					
 					if(waiters.length < 2) {
-						httpData.get(baseUrl, {cache:true}).then(function(config) {
+						httpData.get(baseUrl, {cache:true}).then(function(response) {
+                            var config = response && response.data;
 							// Anon users don't have an id or version yet.
 							if(!config.clientSessionId || !config.version) {
-								httpData.get(dynamicConfigUrl + Date.now()).then(function(data) {
-									config.clientSessionId = data.clientSessionId;
-									config.version = data.version;
+								httpData.get(dynamicConfigUrl + Date.now()).then(function(response) {
+                                    var data = response && response.data;
+                                    config.clientSessionId = data.clientSessionId;
+                                    config.version = data.version;
 									decorateAndResolve();
 								});								
 							} else {
