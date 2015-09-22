@@ -27,7 +27,7 @@ angular.module("explorer.projects", [])
 					}).bind(this));
 				}
                 httpData.get(baseUrl + (new Date()).getTime()).then((function(response) {
-					deferred.resolve(this.projects = response);
+					deferred.resolve(this.projects = response && response.data);
 				}).bind(this));
 			
 				return deferred.promise;

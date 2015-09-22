@@ -22,7 +22,7 @@ angular.module('explorer.assets', ['explorer.projects'])
 		$log.debug(baseUrl + encodeURIComponent(project));
 
         httpData.get(baseUrl + project + "?t=" + sessionTime, {cache:true}).then(function(response) {
-			assets = response;
+			assets = response && response.data;
 			promises.forEach(function(promise) {
 				promise.resolve(assets);
 			});
