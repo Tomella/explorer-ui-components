@@ -15,7 +15,7 @@ angular.module("explorer.version", [])
 		templateUrl:'components/version/versionDisplay.html',
 		link : function(scope) {
 			httpData.get(versionService.url()).then(function(response) {
-				scope.version = response.data.version;
+				scope.version = response && response.data.version;
 			});
 		}
 	};	
