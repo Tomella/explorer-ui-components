@@ -8,23 +8,25 @@
     angular.module("explorer.httpdata", [])
 
         .provider('httpData', function HttpDataProvider() {
-            var _servicesLocation = "", _localPrefixes = [];
+            var _redirects = [];
 
             function fixUrl(url) {
-                // serve resources and partials locally
-                for (var i = _localPrefixes.length; --i >= 0; )
-                    if (url.indexOf(_localPrefixes[i]) === 0)
-                        return url;
+                for (var i = _redirects.length; --i >= 0; ) {
+                    var prefixes = _redirects[i].prefixes;
+                    for (var j = prefixes.length; --j >= 0; ) {
+                        if (url.indexOf(prefixes[j]) === 0)
+                            return _redirects[i].where + url;
+                    }
+                }
 
-                return _servicesLocation + url;
+                return url;
             }
 
-            this.localPrefixes = function (where) {
-                _localPrefixes = where || [];
-            };
-
-            this.servicesLocation = function (where) {
-                _servicesLocation = where;
+            this.redirect = function (where, prefixes) {
+                _redirects.push({
+                    where: where,
+                    prefixes: prefixes
+                });
             };
 
             this.$get = ['$http', '$q', function ($http, $q) {
