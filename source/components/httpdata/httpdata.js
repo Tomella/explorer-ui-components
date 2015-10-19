@@ -30,8 +30,15 @@
             };
 
             this.$get = ['$http', '$q', function ($http, $q) {
-                // Just a convenience wrapper around $http
                 return {
+                    baseUrlForPkg: function(pkg) {
+                        var regexp = new RegExp('((?:.*\/)|^)' + pkg + '[\w-]*\.js(?:\W|$)', 'i');
+                        var scripts = document.getElementsByTagName('script');
+                        for ( var i = 0, len = scripts.length; i < len; ++i) {
+                            var result = regexp.exec(scripts[i].getAttribute('src'));
+                            if (result !== null) return result[1];
+                        }
+                    },
                     get: function (url, options) {
                         return $http.get(fixUrl(url), options);
                     },
