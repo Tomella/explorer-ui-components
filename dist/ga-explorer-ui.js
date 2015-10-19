@@ -1204,8 +1204,15 @@ angular.module("explorer.height.delta", [])
             };
 
             this.$get = ['$http', '$q', function ($http, $q) {
-                // Just a convenience wrapper around $http
                 return {
+                    baseUrlForPkg: function(pkg) {
+                        var regexp = new RegExp('((?:.*\/)|^)' + pkg + '[\w-]*\.js(?:\W|$)', 'i');
+                        var scripts = document.getElementsByTagName('script');
+                        for ( var i = 0, len = scripts.length; i < len; ++i) {
+                            var result = regexp.exec(scripts[i].getAttribute('src'));
+                            if (result !== null) return result[1];
+                        }
+                    },
                     get: function (url, options) {
                         return $http.get(fixUrl(url), options);
                     },
@@ -2123,6 +2130,50 @@ angular.module("explorer.projects", [])
 
 
 })(angular);
+/**
+ * @ngdoc object
+ * @name explorer.resizelistener
+ * @description
+ * 
+ * <p>Binds to window resize event, exposes windowWidth and windowHeight as $scope vars.</p>
+ * 
+ * 
+ **/
+
+angular.module('explorer.resizelistener', [])
+
+.directive('resizeListener', function($window) {
+	
+	return function (scope, element) {
+        var w = angular.element($window);
+        scope.getWindowDimensions = function () {
+            return {
+                'h': w.height(),
+                'w': w.width()
+            };
+        };
+        
+        scope.$watch(scope.getWindowDimensions, function (newValue, oldValue) {
+            
+        	scope.windowHeight = newValue.h;
+            scope.windowWidth = newValue.w;
+
+            scope.style = function () {
+                return {
+                    'height': (newValue.h - 100) + 'px',
+                    'width': (newValue.w - 100) + 'px'
+                };
+            };
+            
+            // could also broadcast 'resize complete' event if needed..
+
+        }, true);
+
+        w.bind('resize', function () {
+            scope.$apply();
+        });
+    };
+});
 /*!
  * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
  */
@@ -2254,50 +2305,6 @@ angular.module("nedf.splash", ['explorer.projects'])
 }]);
 
 })(angular, sessionStorage);
-/**
- * @ngdoc object
- * @name explorer.resizelistener
- * @description
- * 
- * <p>Binds to window resize event, exposes windowWidth and windowHeight as $scope vars.</p>
- * 
- * 
- **/
-
-angular.module('explorer.resizelistener', [])
-
-.directive('resizeListener', function($window) {
-	
-	return function (scope, element) {
-        var w = angular.element($window);
-        scope.getWindowDimensions = function () {
-            return {
-                'h': w.height(),
-                'w': w.width()
-            };
-        };
-        
-        scope.$watch(scope.getWindowDimensions, function (newValue, oldValue) {
-            
-        	scope.windowHeight = newValue.h;
-            scope.windowWidth = newValue.w;
-
-            scope.style = function () {
-                return {
-                    'height': (newValue.h - 100) + 'px',
-                    'width': (newValue.w - 100) + 'px'
-                };
-            };
-            
-            // could also broadcast 'resize complete' event if needed..
-
-        }, true);
-
-        w.bind('resize', function () {
-            scope.$apply();
-        });
-    };
-});
 /*!
  * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
  */
