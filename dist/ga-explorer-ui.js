@@ -563,6 +563,80 @@ angular.module("explorer.enter", [])
 /*!
  * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
  */
+
+(function(angular) {
+
+'use strict';
+
+angular.module("explorer.flasher", [])
+
+.factory('flashService', ['$timeout', function($timeout) {
+	var data = {
+			items:[]
+	};
+	return {
+		getData : function() {
+			return data;
+		},
+		
+		add : function(message, duration, spinner) {
+			if(typeof spinner == "undefined") {
+				spinner = false;
+			}
+			
+			var item = {
+					text:message,
+					spinner:spinner,
+					service:this,
+					remove:function() {
+						this.service.remove(this);
+					}
+			}, self = this;
+			// Set a sane timeout in milliseconds
+			duration = duration?duration:10000;
+			
+			data.items.push(item);
+			item.timer = $timeout(function() {
+				item.timer = null;
+				self.remove(item);
+			}, duration);
+			
+			return item;
+		},
+	
+		remove : function(item) {
+			if(!item) {
+				// Nothing to do here.
+				return;
+			}
+			if(item.timer) {
+				$timeout.cancel(item.timer);
+			}
+			var index = data.items.indexOf(item);
+			if(index > -1) {
+				data.items.splice(index, 1);
+			}
+		}
+	};
+}])
+
+.directive('explorerFlash', ['flashService', '$timeout', function(flashService, $timeout) {
+	return {
+		restrict : "AE",
+		controller : ['$scope', 'flashService', function($scope, flashService) {
+			$scope.messages = flashService.getData();			
+		}],
+		templateUrl: "components/flasher/flash.html",
+		link : function(scope, element, attrs){
+			element.addClass("marsFlash");
+		}
+	};
+}]);
+
+})(angular);
+/*!
+ * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
+ */
 (function(angular, JSON) {
 
 'use strict';
@@ -638,80 +712,6 @@ angular.module('explorer.feature.indicator', ['explorer.projects'])
 }]);
 
 })(angular, JSON);
-/*!
- * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
- */
-
-(function(angular) {
-
-'use strict';
-
-angular.module("explorer.flasher", [])
-
-.factory('flashService', ['$timeout', function($timeout) {
-	var data = {
-			items:[]
-	};
-	return {
-		getData : function() {
-			return data;
-		},
-		
-		add : function(message, duration, spinner) {
-			if(typeof spinner == "undefined") {
-				spinner = false;
-			}
-			
-			var item = {
-					text:message,
-					spinner:spinner,
-					service:this,
-					remove:function() {
-						this.service.remove(this);
-					}
-			}, self = this;
-			// Set a sane timeout in milliseconds
-			duration = duration?duration:10000;
-			
-			data.items.push(item);
-			item.timer = $timeout(function() {
-				item.timer = null;
-				self.remove(item);
-			}, duration);
-			
-			return item;
-		},
-	
-		remove : function(item) {
-			if(!item) {
-				// Nothing to do here.
-				return;
-			}
-			if(item.timer) {
-				$timeout.cancel(item.timer);
-			}
-			var index = data.items.indexOf(item);
-			if(index > -1) {
-				data.items.splice(index, 1);
-			}
-		}
-	};
-}])
-
-.directive('explorerFlash', ['flashService', '$timeout', function(flashService, $timeout) {
-	return {
-		restrict : "AE",
-		controller : ['$scope', 'flashService', function($scope, flashService) {
-			$scope.messages = flashService.getData();			
-		}],
-		templateUrl: "components/flasher/flash.html",
-		link : function(scope, element, attrs){
-			element.addClass("marsFlash");
-		}
-	};
-}]);
-
-})(angular);
 /*!
  * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
  */
@@ -850,7 +850,7 @@ angular.module('explorer.googleanalytics', [])
 
 angular.module("graph", [])
 
-.directive("explorerGraph", ['$log', function($log) {
+.directive("explorerGraph", function() {
 	var WIDTH = 1000,
 	HEIGHT = 90;
 
@@ -927,7 +927,6 @@ angular.module("graph", [])
 					scope.data.forEach(function(dataset) {
 						var key = Math.round(index * dataset.data.length/1000),
 							thisPoint = dataset.data[key];
-						$log.debug(key);
 						points.push({
 							index:key,
 							point: thisPoint
@@ -966,7 +965,6 @@ angular.module("graph", [])
 				if(!data) {
 					data = [[]];
 				}
-				$log.debug(data.length);
 				var points = [];
 				data.forEach(function(parts) {
 					if(parts.data) {
@@ -1024,7 +1022,7 @@ angular.module("graph", [])
 			}
 		}
 	};	
-}])
+})
 
 .directive("explorerLine", [function() {
 	var WIDTH = 1000,

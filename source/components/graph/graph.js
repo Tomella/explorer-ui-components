@@ -7,7 +7,7 @@
 
 angular.module("graph", [])
 
-.directive("explorerGraph", ['$log', function($log) {
+.directive("explorerGraph", function() {
 	var WIDTH = 1000,
 	HEIGHT = 90;
 
@@ -84,7 +84,6 @@ angular.module("graph", [])
 					scope.data.forEach(function(dataset) {
 						var key = Math.round(index * dataset.data.length/1000),
 							thisPoint = dataset.data[key];
-						$log.debug(key);
 						points.push({
 							index:key,
 							point: thisPoint
@@ -123,7 +122,6 @@ angular.module("graph", [])
 				if(!data) {
 					data = [[]];
 				}
-				$log.debug(data.length);
 				var points = [];
 				data.forEach(function(parts) {
 					if(parts.data) {
@@ -181,7 +179,7 @@ angular.module("graph", [])
 			}
 		}
 	};	
-}])
+})
 
 .directive("explorerLine", [function() {
 	var WIDTH = 1000,
