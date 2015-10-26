@@ -14,13 +14,7 @@ angular.module('explorer.assets', ['explorer.projects'])
 	baseUrl = "service/asset/assets/",
 	sessionTime = Date.now();
 	
-	function afterProject(project) {
-		
-		// piggyback off explorer assets
-		project = "Explorer";
-		
-		$log.debug(baseUrl + encodeURIComponent(project));
-
+	function afterProject(project) {	
         httpData.get(baseUrl + project + "?t=" + sessionTime, {cache:true}).then(function(response) {
 			assets = response && response.data;
 			promises.forEach(function(promise) {
@@ -563,80 +557,6 @@ angular.module("explorer.enter", [])
 /*!
  * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
  */
-
-(function(angular) {
-
-'use strict';
-
-angular.module("explorer.flasher", [])
-
-.factory('flashService', ['$timeout', function($timeout) {
-	var data = {
-			items:[]
-	};
-	return {
-		getData : function() {
-			return data;
-		},
-		
-		add : function(message, duration, spinner) {
-			if(typeof spinner == "undefined") {
-				spinner = false;
-			}
-			
-			var item = {
-					text:message,
-					spinner:spinner,
-					service:this,
-					remove:function() {
-						this.service.remove(this);
-					}
-			}, self = this;
-			// Set a sane timeout in milliseconds
-			duration = duration?duration:10000;
-			
-			data.items.push(item);
-			item.timer = $timeout(function() {
-				item.timer = null;
-				self.remove(item);
-			}, duration);
-			
-			return item;
-		},
-	
-		remove : function(item) {
-			if(!item) {
-				// Nothing to do here.
-				return;
-			}
-			if(item.timer) {
-				$timeout.cancel(item.timer);
-			}
-			var index = data.items.indexOf(item);
-			if(index > -1) {
-				data.items.splice(index, 1);
-			}
-		}
-	};
-}])
-
-.directive('explorerFlash', ['flashService', '$timeout', function(flashService, $timeout) {
-	return {
-		restrict : "AE",
-		controller : ['$scope', 'flashService', function($scope, flashService) {
-			$scope.messages = flashService.getData();			
-		}],
-		templateUrl: "components/flasher/flash.html",
-		link : function(scope, element, attrs){
-			element.addClass("marsFlash");
-		}
-	};
-}]);
-
-})(angular);
-/*!
- * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
- */
 (function(angular, JSON) {
 
 'use strict';
@@ -712,6 +632,80 @@ angular.module('explorer.feature.indicator', ['explorer.projects'])
 }]);
 
 })(angular, JSON);
+/*!
+ * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
+ */
+
+(function(angular) {
+
+'use strict';
+
+angular.module("explorer.flasher", [])
+
+.factory('flashService', ['$timeout', function($timeout) {
+	var data = {
+			items:[]
+	};
+	return {
+		getData : function() {
+			return data;
+		},
+		
+		add : function(message, duration, spinner) {
+			if(typeof spinner == "undefined") {
+				spinner = false;
+			}
+			
+			var item = {
+					text:message,
+					spinner:spinner,
+					service:this,
+					remove:function() {
+						this.service.remove(this);
+					}
+			}, self = this;
+			// Set a sane timeout in milliseconds
+			duration = duration?duration:10000;
+			
+			data.items.push(item);
+			item.timer = $timeout(function() {
+				item.timer = null;
+				self.remove(item);
+			}, duration);
+			
+			return item;
+		},
+	
+		remove : function(item) {
+			if(!item) {
+				// Nothing to do here.
+				return;
+			}
+			if(item.timer) {
+				$timeout.cancel(item.timer);
+			}
+			var index = data.items.indexOf(item);
+			if(index > -1) {
+				data.items.splice(index, 1);
+			}
+		}
+	};
+}])
+
+.directive('explorerFlash', ['flashService', '$timeout', function(flashService, $timeout) {
+	return {
+		restrict : "AE",
+		controller : ['$scope', 'flashService', function($scope, flashService) {
+			$scope.messages = flashService.getData();			
+		}],
+		templateUrl: "components/flasher/flash.html",
+		link : function(scope, element, attrs){
+			element.addClass("marsFlash");
+		}
+	};
+}]);
+
+})(angular);
 /*!
  * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
  */
@@ -795,50 +789,6 @@ angular.module('page.footer', [])
 	};
 }]);
 
-
-})(angular);
-/*!
- * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
- */
-(function(angular) {
-
-'use strict';
-
-angular.module('explorer.googleanalytics', [])
-
-.directive('expGa', ['$window', 'ga', function($window, ga) {
-	return {
-		restrict: 'A',
-		replace : false,
-		scope: {
-			expGa : "="
-		},
-		link: function(scope, element, attrs) {
-			var event = attrs.gaOn || 'click';
-			
- 		    if (event == 'init') {
- 			    send(scope.ga);
- 		    } else {
- 		    	element.on(event, send);
- 		    }
-    	   
-    	    function send() {
-    	    	ga(scope.expGa);
-    		}
-		}
-    };
-}])
-
-.factory('ga', ['$log', '$window', function ($log, $window) {
-    return function() {
-        if ($window.ga) {
-            $window.ga.apply(this, arguments);
-        } else {
-    		$log.warn("No Google Analytics");
-    		$log.warn(scope.expGa);
-    	}
-    };
-}]);
 
 })(angular);
 /*!
@@ -1085,6 +1035,50 @@ angular.module("graph", [])
 
 'use strict';
 
+angular.module('explorer.googleanalytics', [])
+
+.directive('expGa', ['$window', 'ga', function($window, ga) {
+	return {
+		restrict: 'A',
+		replace : false,
+		scope: {
+			expGa : "="
+		},
+		link: function(scope, element, attrs) {
+			var event = attrs.gaOn || 'click';
+			
+ 		    if (event == 'init') {
+ 			    send(scope.ga);
+ 		    } else {
+ 		    	element.on(event, send);
+ 		    }
+    	   
+    	    function send() {
+    	    	ga(scope.expGa);
+    		}
+		}
+    };
+}])
+
+.factory('ga', ['$log', '$window', function ($log, $window) {
+    return function() {
+        if ($window.ga) {
+            $window.ga.apply(this, arguments);
+        } else {
+    		$log.warn("No Google Analytics");
+    		$log.warn(scope.expGa);
+    	}
+    };
+}]);
+
+})(angular);
+/*!
+ * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
+ */
+(function(angular) {
+
+'use strict';
+
 angular.module('explorer.header', [])
 
 .controller('headerController', [ '$scope', '$q', '$timeout', function ($scope, $q, $timeout) {
@@ -1173,63 +1167,6 @@ angular.module("explorer.height.delta", [])
 /*!
  * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
  */
-(function (angular) {
-
-    'use strict';
-
-    angular.module("explorer.httpdata", [])
-
-        .provider('httpData', function HttpDataProvider() {
-            var _redirects = [];
-
-            function fixUrl(url) {
-                for (var i = _redirects.length; --i >= 0; ) {
-                    var prefixes = _redirects[i].prefixes;
-                    for (var j = prefixes.length; --j >= 0; ) {
-                        if (url.indexOf(prefixes[j]) === 0)
-                            return _redirects[i].where + url;
-                    }
-                }
-
-                return url;
-            }
-
-            this.redirect = function (where, prefixes) {
-                _redirects.push({
-                    where: where,
-                    prefixes: prefixes
-                });
-            };
-
-            this.$get = ['$http', '$q', function ($http, $q) {
-                return {
-                    baseUrlForPkg: function(pkg) {
-                        var regexp = new RegExp('((?:.*\/)|^)' + pkg + '[\w-]*\.js(?:\W|$)', 'i');
-                        var scripts = document.getElementsByTagName('script');
-                        for ( var i = 0, len = scripts.length; i < len; ++i) {
-                            var result = regexp.exec(scripts[i].getAttribute('src'));
-                            if (result !== null) return result[1];
-                        }
-                    },
-                    get: function (url, options) {
-                        return $http.get(fixUrl(url), options);
-                    },
-
-                    post: function (url, data, options) {
-                        return $http.post(fixUrl(url), data, options);
-                    },
-
-                    put: function (url, data, options) {
-                        return $http.put(fixUrl(url), data, options);
-                    }
-                };
-            }];
-        });
-
-})(angular);
-/*!
- * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
- */
 (function(angular, window) {
 
 'use strict';
@@ -1308,6 +1245,63 @@ angular.module('explorer.httpinterceptors.authentication', [])
 }]);
 
 })(angular, window);
+/*!
+ * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
+ */
+(function (angular) {
+
+    'use strict';
+
+    angular.module("explorer.httpdata", [])
+
+        .provider('httpData', function HttpDataProvider() {
+            var _redirects = [];
+
+            function fixUrl(url) {
+                for (var i = _redirects.length; --i >= 0; ) {
+                    var prefixes = _redirects[i].prefixes;
+                    for (var j = prefixes.length; --j >= 0; ) {
+                        if (url.indexOf(prefixes[j]) === 0)
+                            return _redirects[i].where + url;
+                    }
+                }
+
+                return url;
+            }
+
+            this.redirect = function (where, prefixes) {
+                _redirects.push({
+                    where: where,
+                    prefixes: prefixes
+                });
+            };
+
+            this.$get = ['$http', '$q', function ($http, $q) {
+                return {
+                    baseUrlForPkg: function(pkg) {
+                        var regexp = new RegExp('((?:.*\/)|^)' + pkg + '[\w-]*\.js(?:\W|$)', 'i');
+                        var scripts = document.getElementsByTagName('script');
+                        for ( var i = 0, len = scripts.length; i < len; ++i) {
+                            var result = regexp.exec(scripts[i].getAttribute('src'));
+                            if (result !== null) return result[1];
+                        }
+                    },
+                    get: function (url, options) {
+                        return $http.get(fixUrl(url), options);
+                    },
+
+                    post: function (url, data, options) {
+                        return $http.post(fixUrl(url), data, options);
+                    },
+
+                    put: function (url, data, options) {
+                        return $http.put(fixUrl(url), data, options);
+                    }
+                };
+            }];
+        });
+
+})(angular);
 /*!
  * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
  */
@@ -2022,6 +2016,27 @@ angular.module("explorer.ping", [])
 /*!
  * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
  */
+(function(angular, window) {
+
+'use strict';
+
+angular.module('mars.print', [])
+
+.directive('marsPrintMap', [function() {
+	return {
+		template : '<i class="fa fa-print"></i>',
+		link : function(scope, element) {	
+			element.on("click", function() {
+				window.print();
+			});
+		}
+	};
+}]);
+
+})(angular, window);
+/*!
+ * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
+ */
 (function(angular) {
 
 'use strict';
@@ -2063,27 +2078,6 @@ angular.module('explorer.popover', [])
 }]);
 
 })(angular);
-/*!
- * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
- */
-(function(angular, window) {
-
-'use strict';
-
-angular.module('mars.print', [])
-
-.directive('marsPrintMap', [function() {
-	return {
-		template : '<i class="fa fa-print"></i>',
-		link : function(scope, element) {	
-			element.on("click", function() {
-				window.print();
-			});
-		}
-	};
-}]);
-
-})(angular, window);
 /*!
  * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
  */

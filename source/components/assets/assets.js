@@ -14,13 +14,7 @@ angular.module('explorer.assets', ['explorer.projects'])
 	baseUrl = "service/asset/assets/",
 	sessionTime = Date.now();
 	
-	function afterProject(project) {
-		
-		// piggyback off explorer assets
-		project = "Explorer";
-		
-		$log.debug(baseUrl + encodeURIComponent(project));
-
+	function afterProject(project) {	
         httpData.get(baseUrl + project + "?t=" + sessionTime, {cache:true}).then(function(response) {
 			assets = response && response.data;
 			promises.forEach(function(promise) {
