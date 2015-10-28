@@ -265,90 +265,6 @@ angular.module("explorer.asynch", [])
 	
 'use strict';
 
-angular.module("explorer.config", ['explorer.httpdata', 'explorer.waiting'])
-
-.provider("configService", function ConfigServiceProvider() {
-	var baseUrl = "service/appConfig/config",
-		dynamicConfigUrl = "service/appConfig/config?t=",
-		persistedConfig,
-		waiters,
-		now = Date.now() % 10000000;
-	
-	this.location = function(where) {
-		baseUrl = where;
-	};
-	
-	this.dynamicLocation = function(where) {
-		dynamicConfigUrl = where;
-	};
-	
-	this.$get = ['$q', 'httpData', 'waiting', function configServiceFactory($q, httpData, waiting) {
-		var $config =  {
-			getConfig : function(child) {
-				var deferred; 
-				if(child) {
-					deferred = $q.defer();
-					this._getConfig().then(function(config) {
-						deferred.resolve(config[child]);
-					});
-					return deferred.promise;
-				} else {
-					return this._getConfig();
-				}
-			},
-			_getConfig : function() {
-				var deferred;
-
-				if(!waiters) {
-					waiters = waiting.wait();
-				}
-				
-				if(persistedConfig) {
-					return $q.when(persistedConfig);
-				} else {
-					deferred = waiters.waiter();					
-					
-					if(waiters.length < 2) {
-						httpData.get(baseUrl, {cache:true}).then(function(response) {
-                            var config = response && response.data;
-							// Anon users don't have an id or version yet.
-							if(!config.clientSessionId || !config.version) {
-								httpData.get(dynamicConfigUrl + Date.now()).then(function(response) {
-                                    var data = response && response.data;
-                                    config.clientSessionId = data.clientSessionId;
-                                    config.version = data.version;
-									decorateAndResolve();
-								});								
-							} else {
-								decorateAndResolve();
-							}
-							
-							function decorateAndResolve() {
-								persistedConfig = config;
-								config.localClientSessionId = config.clientSessionId + "-" + now;
-								waiters.resolve(config);
-								// Clean it up.
-								waiters = null;
-							}							
-						});
-					}
-				}
-				return deferred.promise;
-			}
-		};
-		return $config;		
-	}];
-});
-
-})(angular);
-/*!
- * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
- */
-
-(function(angular) {
-	
-'use strict';
-
 angular.module("explorer.broker", [])
 
 .factory("brokerService", ['$log', function($log) {
@@ -449,6 +365,90 @@ angular.module("explorer.confirm", ['ui.bootstrap', 'explorer.focusme'])
 		}
 	};
 }]);
+
+})(angular);
+/*!
+ * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
+ */
+
+(function(angular) {
+	
+'use strict';
+
+angular.module("explorer.config", ['explorer.httpdata', 'explorer.waiting'])
+
+.provider("configService", function ConfigServiceProvider() {
+	var baseUrl = "service/appConfig/config",
+		dynamicConfigUrl = "service/appConfig/config?t=",
+		persistedConfig,
+		waiters,
+		now = Date.now() % 10000000;
+	
+	this.location = function(where) {
+		baseUrl = where;
+	};
+	
+	this.dynamicLocation = function(where) {
+		dynamicConfigUrl = where;
+	};
+	
+	this.$get = ['$q', 'httpData', 'waiting', function configServiceFactory($q, httpData, waiting) {
+		var $config =  {
+			getConfig : function(child) {
+				var deferred; 
+				if(child) {
+					deferred = $q.defer();
+					this._getConfig().then(function(config) {
+						deferred.resolve(config[child]);
+					});
+					return deferred.promise;
+				} else {
+					return this._getConfig();
+				}
+			},
+			_getConfig : function() {
+				var deferred;
+
+				if(!waiters) {
+					waiters = waiting.wait();
+				}
+				
+				if(persistedConfig) {
+					return $q.when(persistedConfig);
+				} else {
+					deferred = waiters.waiter();					
+					
+					if(waiters.length < 2) {
+						httpData.get(baseUrl, {cache:true}).then(function(response) {
+                            var config = response && response.data;
+							// Anon users don't have an id or version yet.
+							if(!config.clientSessionId || !config.version) {
+								httpData.get(dynamicConfigUrl + Date.now()).then(function(response) {
+                                    var data = response && response.data;
+                                    config.clientSessionId = data.clientSessionId;
+                                    config.version = data.version;
+									decorateAndResolve();
+								});								
+							} else {
+								decorateAndResolve();
+							}
+							
+							function decorateAndResolve() {
+								persistedConfig = config;
+								config.localClientSessionId = config.clientSessionId + "-" + now;
+								waiters.resolve(config);
+								// Clean it up.
+								waiters = null;
+							}							
+						});
+					}
+				}
+				return deferred.promise;
+			}
+		};
+		return $config;		
+	}];
+});
 
 })(angular);
 /*!
@@ -738,50 +738,6 @@ angular.module("explorer.focusme", [])
 
 'use strict';
 
-angular.module('explorer.googleanalytics', [])
-
-.directive('expGa', ['$window', 'ga', function($window, ga) {
-	return {
-		restrict: 'A',
-		replace : false,
-		scope: {
-			expGa : "="
-		},
-		link: function(scope, element, attrs) {
-			var event = attrs.gaOn || 'click';
-			
- 		    if (event == 'init') {
- 			    send(scope.ga);
- 		    } else {
- 		    	element.on(event, send);
- 		    }
-    	   
-    	    function send() {
-    	    	ga(scope.expGa);
-    		}
-		}
-    };
-}])
-
-.factory('ga', ['$log', '$window', function ($log, $window) {
-    return function() {
-        if ($window.ga) {
-            $window.ga.apply(this, arguments);
-        } else {
-    		$log.warn("No Google Analytics");
-    		$log.warn(scope.expGa);
-    	}
-    };
-}]);
-
-})(angular);
-/*!
- * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
- */
-(function(angular) {
-
-'use strict';
-
 angular.module('page.footer', [])
 
 .directive('pageFooter', [function() {
@@ -833,6 +789,50 @@ angular.module('page.footer', [])
 	};
 }]);
 
+
+})(angular);
+/*!
+ * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
+ */
+(function(angular) {
+
+'use strict';
+
+angular.module('explorer.googleanalytics', [])
+
+.directive('expGa', ['$window', 'ga', function($window, ga) {
+	return {
+		restrict: 'A',
+		replace : false,
+		scope: {
+			expGa : "="
+		},
+		link: function(scope, element, attrs) {
+			var event = attrs.gaOn || 'click';
+			
+ 		    if (event == 'init') {
+ 			    send(scope.ga);
+ 		    } else {
+ 		    	element.on(event, send);
+ 		    }
+    	   
+    	    function send() {
+    	    	ga(scope.expGa);
+    		}
+		}
+    };
+}])
+
+.factory('ga', ['$log', '$window', function ($log, $window) {
+    return function() {
+        if ($window.ga) {
+            $window.ga.apply(this, arguments);
+        } else {
+    		$log.warn("No Google Analytics");
+    		$log.warn(scope.expGa);
+    	}
+    };
+}]);
 
 })(angular);
 /*!
@@ -1075,6 +1075,41 @@ angular.module("graph", [])
 /*!
  * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
  */
+(function($, window, angular) {
+
+'use strict';
+
+angular.module("explorer.height.delta", [])
+
+.directive('heightDelta', ['$timeout', function($timeout) {
+	return {
+		link : function(scope, element, attrs) {
+			function resize(force) {
+				var obj, height, newHeight,
+					data = attrs.heightDelta;
+				if(data) {
+					obj = JSON.parse(data);
+					height = $(obj.selector).height();
+					newHeight = height + obj.delta;
+					if(!obj.min || newHeight > obj.min) {
+						element.height(newHeight);
+					}
+				}
+			}		
+			$(window).on("resize", function() {
+				resize(false); 
+			});
+			$timeout(function() {
+				resize(true);
+			});
+		}
+	};
+}]);
+
+})($, window, angular);
+/*!
+ * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
+ */
 (function(angular) {
 
 'use strict';
@@ -1185,98 +1220,6 @@ angular.module('exp.web.login.header', [])
 	};
 }]);
 
-})();
-/*!
- * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
- */
-(function($, window, angular) {
-
-'use strict';
-
-angular.module("explorer.height.delta", [])
-
-.directive('heightDelta', ['$timeout', function($timeout) {
-	return {
-		link : function(scope, element, attrs) {
-			function resize(force) {
-				var obj, height, newHeight,
-					data = attrs.heightDelta;
-				if(data) {
-					obj = JSON.parse(data);
-					height = $(obj.selector).height();
-					newHeight = height + obj.delta;
-					if(!obj.min || newHeight > obj.min) {
-						element.height(newHeight);
-					}
-				}
-			}		
-			$(window).on("resize", function() {
-				resize(false); 
-			});
-			$timeout(function() {
-				resize(true);
-			});
-		}
-	};
-}]);
-
-})($, window, angular);
-/*!
- * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
- */
-(function (angular) {
-
-    'use strict';
-
-    angular.module("explorer.httpdata", [])
-
-        .provider('httpData', function HttpDataProvider() {
-            var _redirects = [];
-
-            function fixUrl(url) {
-                for (var i = _redirects.length; --i >= 0; ) {
-                    var prefixes = _redirects[i].prefixes;
-                    for (var j = prefixes.length; --j >= 0; ) {
-                        if (url.indexOf(prefixes[j]) === 0)
-                            return _redirects[i].where + url;
-                    }
-                }
-
-                return url;
-            }
-
-            this.redirect = function (where, prefixes) {
-                _redirects.push({
-                    where: where,
-                    prefixes: prefixes
-                });
-            };
-
-            this.$get = ['$http', '$q', function ($http, $q) {
-                return {
-                    baseUrlForPkg: function(pkg) {
-                        var regexp = new RegExp('((?:.*\/)|^)' + pkg + '[\w-]*\.js(?:\W|$)', 'i');
-                        var scripts = document.getElementsByTagName('script');
-                        for ( var i = 0, len = scripts.length; i < len; ++i) {
-                            var result = regexp.exec(scripts[i].getAttribute('src'));
-                            if (result !== null) return result[1];
-                        }
-                    },
-                    get: function (url, options) {
-                        return $http.get(fixUrl(url), options);
-                    },
-
-                    post: function (url, data, options) {
-                        return $http.post(fixUrl(url), data, options);
-                    },
-
-                    put: function (url, data, options) {
-                        return $http.put(fixUrl(url), data, options);
-                    }
-                };
-            }];
-        });
-
 })(angular);
 /*!
  * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
@@ -1359,6 +1302,63 @@ angular.module('explorer.httpinterceptors.authentication', [])
 }]);
 
 })(angular, window);
+/*!
+ * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
+ */
+(function (angular) {
+
+    'use strict';
+
+    angular.module("explorer.httpdata", [])
+
+        .provider('httpData', function HttpDataProvider() {
+            var _redirects = [];
+
+            function fixUrl(url) {
+                for (var i = _redirects.length; --i >= 0; ) {
+                    var prefixes = _redirects[i].prefixes;
+                    for (var j = prefixes.length; --j >= 0; ) {
+                        if (url.indexOf(prefixes[j]) === 0)
+                            return _redirects[i].where + url;
+                    }
+                }
+
+                return url;
+            }
+
+            this.redirect = function (where, prefixes) {
+                _redirects.push({
+                    where: where,
+                    prefixes: prefixes
+                });
+            };
+
+            this.$get = ['$http', '$q', function ($http, $q) {
+                return {
+                    baseUrlForPkg: function(pkg) {
+                        var regexp = new RegExp('((?:.*\/)|^)' + pkg + '[\w-]*\.js(?:\W|$)', 'i');
+                        var scripts = document.getElementsByTagName('script');
+                        for ( var i = 0, len = scripts.length; i < len; ++i) {
+                            var result = regexp.exec(scripts[i].getAttribute('src'));
+                            if (result !== null) return result[1];
+                        }
+                    },
+                    get: function (url, options) {
+                        return $http.get(fixUrl(url), options);
+                    },
+
+                    post: function (url, data, options) {
+                        return $http.post(fixUrl(url), data, options);
+                    },
+
+                    put: function (url, data, options) {
+                        return $http.put(fixUrl(url), data, options);
+                    }
+                };
+            }];
+        });
+
+})(angular);
 /*!
  * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
  */
@@ -1588,60 +1588,6 @@ angular.module("knob", [])
 /*!
  * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
  */
-(function(angular) { 
-
-'use strict'; 
-
-angular.module("explorer.legend", [])
-
-.directive("explorerLegend", ['$modal', function($modal){
-	return {
-		scope : {
-			legend : "=",
-			heading:"=?"
-		},
-		controller : ['$scope', function($scope) {
-			if(!$scope.heading) {
-				$scope.heading = "Legend";
-			}
-			$scope.showing = false;
-		}],
-		link : function(scope, element) {
-			var modalInstance;
-			element.on('click', function() {
-				if(scope.showing) {
-					modalInstance.close(null);
-					return;
-				}
-				modalInstance = $modal.open({
-					templateUrl: 'components/legend/legend.html',
-					windowClass: 'legendContainer',
-					size:'sm',
-					controller : ['$scope', '$modalInstance', 'legend', 'heading', function($scope, $modalInstance, legend, heading) {
-						$scope.legend = legend;
-						$scope.heading = heading;
-					}],
-					backdrop:false,
-					resolve: {
-						legend: function () {
-							return scope.legend;
-						},
-						heading : function() {
-							return scope.heading;
-						}
-					}
-				});
-				modalInstance.result.then(function() {scope.showing = false;}, function() {scope.showing = false;});
-				scope.showing = true;
-			});
-		}
-	};
-}]);
-
-})(angular);
-/*!
- * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
- */
 
 (function(angular) {
 'use strict';
@@ -1721,6 +1667,60 @@ loginService.login();
 		};
 	}];
 });
+
+})(angular);
+/*!
+ * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
+ */
+(function(angular) { 
+
+'use strict'; 
+
+angular.module("explorer.legend", [])
+
+.directive("explorerLegend", ['$modal', function($modal){
+	return {
+		scope : {
+			legend : "=",
+			heading:"=?"
+		},
+		controller : ['$scope', function($scope) {
+			if(!$scope.heading) {
+				$scope.heading = "Legend";
+			}
+			$scope.showing = false;
+		}],
+		link : function(scope, element) {
+			var modalInstance;
+			element.on('click', function() {
+				if(scope.showing) {
+					modalInstance.close(null);
+					return;
+				}
+				modalInstance = $modal.open({
+					templateUrl: 'components/legend/legend.html',
+					windowClass: 'legendContainer',
+					size:'sm',
+					controller : ['$scope', '$modalInstance', 'legend', 'heading', function($scope, $modalInstance, legend, heading) {
+						$scope.legend = legend;
+						$scope.heading = heading;
+					}],
+					backdrop:false,
+					resolve: {
+						legend: function () {
+							return scope.legend;
+						},
+						heading : function() {
+							return scope.heading;
+						}
+					}
+				});
+				modalInstance.result.then(function() {scope.showing = false;}, function() {scope.showing = false;});
+				scope.showing = true;
+			});
+		}
+	};
+}]);
 
 })(angular);
 /*!
@@ -2219,50 +2219,6 @@ angular.module('mars.print', [])
 }]);
 
 })(angular, window);
-/*!
- * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
- */
-(function(angular) {
-
-	
-'use strict';
-
-angular.module("explorer.projects", [])
-
-.provider('projectsService', function ProjectsServiceProvider() { 
-	var currentProject = "<NONE>";
-
-	this.$get =  ['$q', '$timeout', 'httpData', function ($q, $timeout, httpData) {
-		var baseUrl = 'service/appConfig/projects?t=';
-	
-		return {
-			getCurrentProject : function() {
-				return $q.when(currentProject);
-			},
-		
-			getProjects : function() {
-				var deferred = $q.defer();
-				if(this.projects) {				
-					$timeout((function() {
-						deferred.resolve(this.projects);
-					}).bind(this));
-				}
-                httpData.get(baseUrl + (new Date()).getTime()).then((function(response) {
-					deferred.resolve(this.projects = response && response.data);
-				}).bind(this));
-			
-				return deferred.promise;
-			}
-		};
-	}];
-	
-	this.setProject = function(project) {
-		currentProject = project;
-	};
-});
-
-
-})(angular);
 /**
  * @ngdoc object
  * @name explorer.resizelistener
@@ -2312,54 +2268,43 @@ angular.module('explorer.resizelistener', [])
  */
 (function(angular) {
 
+	
 'use strict';
 
-angular.module('explorer.switch', [])
+angular.module("explorer.projects", [])
 
-.directive('explorerSwitch', [function () {
-	return {
-		restrict: 'EA',
-		scope: {
-			disabled: '=',
-			onLabel: '@',
-			offLabel: '@',
-			knobLabel: '@',
-			model: '='    	  
-		},
-    
-		template: '<div role="radio" class="toggle-switch" ng-class="{ \'disabled\': disabled }">' +
-        	'<div class="toggle-switch-animate" ng-class="{\'switch-off\': !model, \'switch-on\': model}">' +
-        	'<span class="switch-left switch-text" ng-bind="onLabel"></span>' +
-        	'<span class="switch-label-text" ng-bind="knobLabel"></span>' +
-        	'<span class="switch-right switch-text" ng-bind="offLabel"></span>' +
-        	'</div>' +
-        	'</div>',
-        link: function(scope, element){
-        	if(!scope.onLabel) { 
-        		scope.onLabel = 'On'; 
-        	}
-        	if(!scope.offLabel) { 
-        		scope.offLabel = 'Off'; 
-        	}
-        	if(!scope.knobLabel) { 
-        		scope.knobLabel = '\u00a0'; 
-        	}
-        	if(!scope.disabled) { 
-        		scope.disabled = false; 
-        	}
+.provider('projectsService', function ProjectsServiceProvider() { 
+	var currentProject = "<NONE>";
 
-        	element.on('click', function() {
-        		scope.$apply(scope.toggle);
-        	});
-        	
-        	scope.toggle = function toggle() {
-        		if(!scope.disabled) {
-    				scope.model = !scope.model;
-    			}
-    		};
-    	}
-  	};
-}]);
+	this.$get =  ['$q', '$timeout', 'httpData', function ($q, $timeout, httpData) {
+		var baseUrl = 'service/appConfig/projects?t=';
+	
+		return {
+			getCurrentProject : function() {
+				return $q.when(currentProject);
+			},
+		
+			getProjects : function() {
+				var deferred = $q.defer();
+				if(this.projects) {				
+					$timeout((function() {
+						deferred.resolve(this.projects);
+					}).bind(this));
+				}
+                httpData.get(baseUrl + (new Date()).getTime()).then((function(response) {
+					deferred.resolve(this.projects = response && response.data);
+				}).bind(this));
+			
+				return deferred.promise;
+			}
+		};
+	}];
+	
+	this.setProject = function(project) {
+		currentProject = project;
+	};
+});
+
 
 })(angular);
 /*!
@@ -2493,6 +2438,61 @@ angular.module("nedf.splash", ['explorer.projects'])
 }]);
 
 })(angular, sessionStorage);
+/*!
+ * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
+ */
+(function(angular) {
+
+'use strict';
+
+angular.module('explorer.switch', [])
+
+.directive('explorerSwitch', [function () {
+	return {
+		restrict: 'EA',
+		scope: {
+			disabled: '=',
+			onLabel: '@',
+			offLabel: '@',
+			knobLabel: '@',
+			model: '='    	  
+		},
+    
+		template: '<div role="radio" class="toggle-switch" ng-class="{ \'disabled\': disabled }">' +
+        	'<div class="toggle-switch-animate" ng-class="{\'switch-off\': !model, \'switch-on\': model}">' +
+        	'<span class="switch-left switch-text" ng-bind="onLabel"></span>' +
+        	'<span class="switch-label-text" ng-bind="knobLabel"></span>' +
+        	'<span class="switch-right switch-text" ng-bind="offLabel"></span>' +
+        	'</div>' +
+        	'</div>',
+        link: function(scope, element){
+        	if(!scope.onLabel) { 
+        		scope.onLabel = 'On'; 
+        	}
+        	if(!scope.offLabel) { 
+        		scope.offLabel = 'Off'; 
+        	}
+        	if(!scope.knobLabel) { 
+        		scope.knobLabel = '\u00a0'; 
+        	}
+        	if(!scope.disabled) { 
+        		scope.disabled = false; 
+        	}
+
+        	element.on('click', function() {
+        		scope.$apply(scope.toggle);
+        	});
+        	
+        	scope.toggle = function toggle() {
+        		if(!scope.disabled) {
+    				scope.model = !scope.model;
+    			}
+    		};
+    	}
+  	};
+}]);
+
+})(angular);
 /**
  * @ngdoc object
  * @name explorer.tabs
@@ -2697,99 +2697,6 @@ angular.module('explorer.toolbar', [])
 /*!
  * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
  */
-(function(angular) {
-	
-
-'use strict';
-
-angular.module("explorer.waiting", [])
-
-.factory("waiting", ['$q', function($q) {
-	return {
-		wait : function() {
-			return new QAll();
-		}
-	};
-	
-	function QAll() {
-		this.waiting = [];
-		this.length = 0;
-		this.waiter = function() {
-			var deferred = $q.defer();
-			this.waiting.push(deferred);
-			this.length++;
-			
-			return deferred;
-		};
-		
-		this.resolve = function(result) {
-			this.waiting.forEach(function(promise) {
-				promise.resolve(result);
-			});
-			this.waiting = [];
-			this.length =0;
-		};
-		
-		this.reject = function(result) {
-			this.waiting.forEach(function(promise) {
-				promise.reject(result);
-			});
-			this.waiting = [];
-			this.length =0;
-		};
-		
-		this.notify = function(result) {
-			this.waiting.forEach(function(promise) {
-				promise.notify(result);
-			});
-		};
-	}
-}]);
-
-})(angular);
-/*!
- * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
- */
-(function(angular) {
-
-'use strict';
-
-angular.module("explorer.version", [])
-
-.directive('marsVersionDisplay', ['httpData', 'versionService', function(httpData, versionService) {
-	/**
-	 * CIAP theme switcher. Retrieves and stores the current theme to the theme service. 
-	 */
-	return {
-		templateUrl:'components/version/versionDisplay.html',
-		link : function(scope) {
-			httpData.get(versionService.url()).then(function(response) {
-				scope.version = response && response.data.version;
-			});
-		}
-	};	
-}])
-
-.provider("versionService", function VersionServiceProvider() {
-	var versionUrl = "service/appConfig/version";
-	
-	this.url = function(url) {
-		versionUrl = url;
-	};
-	
-	this.$get = function configServiceFactory() {
-		return {
-			url : function() {
-				return versionUrl;
-			}
-		};
-	};
-});
-
-})(angular);
-/*!
- * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
- */
 (function(angular, sessionStorage, window) {
 
 'use strict';
@@ -2886,6 +2793,99 @@ angular.module("explorer.user", [])
 });
 
 })(angular, sessionStorage, window);
+/*!
+ * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
+ */
+(function(angular) {
+
+'use strict';
+
+angular.module("explorer.version", [])
+
+.directive('marsVersionDisplay', ['httpData', 'versionService', function(httpData, versionService) {
+	/**
+	 * CIAP theme switcher. Retrieves and stores the current theme to the theme service. 
+	 */
+	return {
+		templateUrl:'components/version/versionDisplay.html',
+		link : function(scope) {
+			httpData.get(versionService.url()).then(function(response) {
+				scope.version = response && response.data.version;
+			});
+		}
+	};	
+}])
+
+.provider("versionService", function VersionServiceProvider() {
+	var versionUrl = "service/appConfig/version";
+	
+	this.url = function(url) {
+		versionUrl = url;
+	};
+	
+	this.$get = function configServiceFactory() {
+		return {
+			url : function() {
+				return versionUrl;
+			}
+		};
+	};
+});
+
+})(angular);
+/*!
+ * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
+ */
+(function(angular) {
+	
+
+'use strict';
+
+angular.module("explorer.waiting", [])
+
+.factory("waiting", ['$q', function($q) {
+	return {
+		wait : function() {
+			return new QAll();
+		}
+	};
+	
+	function QAll() {
+		this.waiting = [];
+		this.length = 0;
+		this.waiter = function() {
+			var deferred = $q.defer();
+			this.waiting.push(deferred);
+			this.length++;
+			
+			return deferred;
+		};
+		
+		this.resolve = function(result) {
+			this.waiting.forEach(function(promise) {
+				promise.resolve(result);
+			});
+			this.waiting = [];
+			this.length =0;
+		};
+		
+		this.reject = function(result) {
+			this.waiting.forEach(function(promise) {
+				promise.reject(result);
+			});
+			this.waiting = [];
+			this.length =0;
+		};
+		
+		this.notify = function(result) {
+			this.waiting.forEach(function(promise) {
+				promise.notify(result);
+			});
+		};
+	}
+}]);
+
+})(angular);
 angular.module("exp.ui.templates", []).run(["$templateCache", function($templateCache) {$templateCache.put("components/confirm/confirm.html","<div class=\"modal-header\">\r\n   <h3 class=\"modal-title\" style=\"font-weight:bolder\">Confirm</h3>\r\n</div>\r\n<div class=\"modal-body\" id=\"accept\" style=\"width: 100%; margin-left: auto; margin-right: auto;\">\r\n	<div>\r\n		{{message}}\r\n	</div>	\r\n	<div style=\"text-align: right;padding-top:10px\">\r\n		<button type=\"button\" class=\"btn btn-default\" style=\"width:4em\" ng-click=\"accept()\" focus-me=\"true\">OK</button>\r\n		<button type=\"button\" class=\"btn btn-default\" style=\"width:4em\" ng-click=\"reject()\">Cancel</button>\r\n	</div>\r\n</div>");
 $templateCache.put("components/flasher/flash.html","<div class=\"marsFlash\" ng-show=\"messages.items.length > 0\">\r\n  <div ng-repeat=\"message in messages.items\">\r\n     <span><img alt=\"Waiting...\" src=\"data:image/gif;base64,R0lGODlhEAAQAPIAAP///wAAAMLCwkJCQgAAAGJiYoKCgpKSkiH/C05FVFNDQVBFMi4wAwEAAAAh/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQJCgAAACwAAAAAEAAQAAADMwi63P4wyklrE2MIOggZnAdOmGYJRbExwroUmcG2LmDEwnHQLVsYOd2mBzkYDAdKa+dIAAAh+QQJCgAAACwAAAAAEAAQAAADNAi63P5OjCEgG4QMu7DmikRxQlFUYDEZIGBMRVsaqHwctXXf7WEYB4Ag1xjihkMZsiUkKhIAIfkECQoAAAAsAAAAABAAEAAAAzYIujIjK8pByJDMlFYvBoVjHA70GU7xSUJhmKtwHPAKzLO9HMaoKwJZ7Rf8AYPDDzKpZBqfvwQAIfkECQoAAAAsAAAAABAAEAAAAzMIumIlK8oyhpHsnFZfhYumCYUhDAQxRIdhHBGqRoKw0R8DYlJd8z0fMDgsGo/IpHI5TAAAIfkECQoAAAAsAAAAABAAEAAAAzIIunInK0rnZBTwGPNMgQwmdsNgXGJUlIWEuR5oWUIpz8pAEAMe6TwfwyYsGo/IpFKSAAAh+QQJCgAAACwAAAAAEAAQAAADMwi6IMKQORfjdOe82p4wGccc4CEuQradylesojEMBgsUc2G7sDX3lQGBMLAJibufbSlKAAAh+QQJCgAAACwAAAAAEAAQAAADMgi63P7wCRHZnFVdmgHu2nFwlWCI3WGc3TSWhUFGxTAUkGCbtgENBMJAEJsxgMLWzpEAACH5BAkKAAAALAAAAAAQABAAAAMyCLrc/jDKSatlQtScKdceCAjDII7HcQ4EMTCpyrCuUBjCYRgHVtqlAiB1YhiCnlsRkAAAOwAAAAAAAAAAAA==\" ng-show=\"message.spinner\" style=\"position:relative;top:2px;\" width=\"12\"></img> {{message.text}}</span>\r\n  </div>\r\n</div>");
 $templateCache.put("components/footer/footer.html","<!-- Footer -->\r\n<nav class=\"navbar navbar-inverse navbar-fixed-bottom ga-footer\" role=\"navigation\" explorer-footer>\r\n    <div class=\"container-fluid\">\r\n        <div class=\"navbar-header\">\r\n            <button type=\"button\" class=\"navbar-toggle\" data-toggle=\"collapse\"\r\n                    data-target=\"#bs-example-navbar-collapse-1\">\r\n                <span class=\"sr-only\">Toggle footer</span>\r\n                <span class=\"icon-bar\"></span>\r\n                <span class=\"icon-bar\"></span>\r\n                <span class=\"icon-bar\"></span>\r\n            </button>\r\n        </div>\r\n        <div class=\"navbar-nobrand\">\r\n            <div class=\"collapse navbar-collapse\" id=\"bs-example-navbar-collapse-1\">\r\n                <ul class=\"nav navbar-nav\">\r\n                    <li><a href=\"http://creativecommons.org/licenses/by/3.0/au/deed.en\"><img src=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQsAAAAyCAYAAABLV/6DAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAuIwAALiMBeKU/dgAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAA8HSURBVHic7Z1rVBRXtsf/jfL0AgIBAQ1oFAkBAdMgRMkVueiIgAICGppRkMx1CK6ok2VITJwkd8locJngva41PrBlREEiQXkomAAGjaDQyBiDQFQUH5EGWp6RR9P0/eCCUFRV09UU8XV+n6h99jln11rU7vPYZx8BgDsgEAgE1fQKACifthUEAuGZp1fraVtAIBCeDyYOf1i3bh3mzJnztGwhEAjPEFVVVThy5MjQM8VZBAYGIigo6A83ikAgPHscP36c4izINIRAIKjFRLaCkvMlqLpaxUsnMpkM5ZfK0dPbw1iuo6MDV1dXODg4wN7eHgYGBmq129/fj/r6etTV1aGqqgqPHj1i1JugNQEuc11ga2urkf39/f14cPcBlEqyFkx4sYmIiMC8efMYy1idxe079ZhmO3XMnZ/Jy8cR8REoFApamb6+PmJjY/HRRx/B3Nxco/bdhe4AALlcDrFYjISEBNy7d4+md674HHz/5IuY/16HiRNZX5uVoqIiFJwu0MhGAuF5wdXVldVZjOs0JOdkDg4fPMzoKKKjo3Hr1i3s3r1bY0cxHG1tbaxfvx43b97Enj17oK+vT9MpPFuIPbv/V6MRQuRaEaysrcZsJ4HwvDJuzqLsYhmO/usYTa6rq4vk5GSIxWJYWfH/8eno6OD9999HWVkZXnvtNVr5pdJLOHI4lXO7urq62LBpA7S0yDIP4eVkXP7z62rr8H9Je2m/4NbW1vjhhx8QExMzHt1ScHFxgUQiwbJly2hledl5yM/L59zmbHs7LA8O5MM8AuG5g3dnIW2U4suERMj75BS5lZUVysrK4OnpyXeXrJiYmCA3NxehoaG0ssPJKbgiucK5zZDQEEz6j0l8mEcgPFfw7izEB8To7OikyAwNDXHmzBnY2Njw3d2oaGlpITU1FfPnz6fIlUolDvzzIPr6+ji1p2+gD/9A+miFQHjR4dVZXK26iiuV1O3WiRMnIjMzE66urnx2xQk9PT3k5ORg9uzZFLmsRYackzmc21sWuEzt7V0C4UWBN2cxMDCAf4mP0OTbt2/HkiVL+OpGY8zMzJCRkUFboDz1bTYeyZjjM9iYNGkSlgX68WkegfDMwz3ggIXC74pw7y41vsHOzg6bN2/mq4sx4+rqiujoaBw6dGhI1tvbi7TUdGzYFMeprWUBy5B14iQGBgZG1VW1TqNUKtHW1oaWlha0trYytjdv3jyak5NKpbh9+7bKfq2srBgD0a5evYru7u5R7SYQhsObszh7hh6w9PXXX0NHR4evLnhh+/btyMjIQFdX15Cs9GIp/vLXd6Grp6t2O4ZGhrB/3R4112tG1S0rK1OrzYGBAdy4cQNpaWlITU0dcgarV6+mOV2ZTAYnJyc0NjYytqWnp4fCwkK88cYbFHlxcTF8fX3VsodAGA4v05CHvz7E3QbqqMLX1xf+/v6j1lUqlaivr8epU6dw7NgxnDt3Ds3NzWr1K5fLce3aNaSnp+PEiRO4ePEiHj9+rLKOpaUlNm7cSG2nT46r/76qVp/DEbq/ybmOKrS0tGBvb48vvvgC1dXVePvttwEAH3/8MX7++WeKrpmZGQ4ePMjaVkJCAs1RtLa2Yu3atSRsnaARvDiLS6WXaLKoqCiVdbq7u7F161YYGxtj5syZCA4ORmRkJHx8fGBtbY2AgABIJBLGur/++ivCwsIwadIkODs7IyIiAuHh4fDy8sKUKVMQHR2NBw8esPa9evVqmqzicoXql2TAbZ4b5zrqoq+vj9zcXJibm6O3txcikQi9vb0UnYCAAERHR9PqLly4EJs2baLJY2Njcf/+/XGzmfBiw5OzuEx51tHRQWAge/BSeXk5nJycsGPHDnR2dtLK+/v7cfr0acyfPx/79u2jlB07dgwODg7IzMyEXC6n1e3q6kJKSgpcXFxQWFjI2L+TkxNmzZpFkVVWXFFr/WE4U6dNxRTLKZzqDOLi4gITExOYmJjA3d0d27dvp+kYGxsPbfn+9NNP+OSTT2g6SUlJlC1pQ0NDpKSk0NY4jh49ioyMDI1sJRAAHpxFV1cX6m/VU2SLFy+GkZERq/6qVatQX0+tY2BggNdff53yTy6XyxEXF4czZ84AAKqrq7Fu3Tp0dHRQ6pqammLGjBkUmUwmQ2hoKG7dusVoR3BwMOW5s7MT9+9x/9W1m23HuQ4AdHR0oK2tDW1tbZBIJNi2bRvKy8tpesO3nL/66isUFxdTyo2MjHD48GEIBAIAT9aJpk+fTtFpaGjAhg0bNLKTQBhkzM6CadvRx8eHVT8+Ph537tz53QAtLezcuRMdHR2oqanBw4cP8c477wyVL1q0CEZGRlAoFIiOjqYEUb3yyivIz8+HTCZDfX09rl+/Dju7Jx+vtrY2zSEMZ8GCBfR3edSq8l2ZMDUz5VyHDaYAserq6qG/lUol1q5di7a2NoqOj48P4uLi4O/vTwulHxgYwJo1a9De3s6bnYSXkzHvhrQyfGDW1taMut3d3di/fz9FFhQUhPj4+KFnCwsLiMVimJubQyQSDR2X/fHHH1FRQV1XSExMxNKlS4eeHRwckJ2djeTkZGzevBnTpk1jtdvS0pIma2ttY9BUjRkPzmLWrFlYsWIFvLy8KHK5XI7vvvuOIrt//z5iY2ORnp5OkX/55ZeMU7pdu3bh/PnzY7aRQBi7s2D4wNhOk1ZXV9OOq0dGRtL09PT0sGfPHops5G6AlpYWY10HBwfs3r17VLuZncUfN7IYLUZCJpMxTrmAJ+nOAgICIBKJhmQGBga0qNKqqips27ZNI/sIhJGMeRrC9IExfYjAk0W6kYycX7Mx0llYWFhAW1tbrbpMMNnI5PhGw9SUv2nIIEqlEvHx8cjNzWXViYuLw927d1nLu7u7IRKJGBeBCQRNGLOz6O/vp8nYArGGB0INou4HPzJ+YiyOAnhyZmXkjgHTu4yGts7Y7GBCIBAgOTkZxcXFMDQ0ZNRpb2/HmjVrWHdwPvzwQ9TUjB4wRiCoy5idxWQTE5rs4cOHjLojg4QAqPx1VFW3sbFxTMFFTU1NtA/N2NiYcztcz5UMEhUVBT8/P/j5+SEmJgZpaWmQyWQUHW9vb5WBVyUlJThw4ABNXlZWhr1792pkF4HAxpidhYnJZJqMLQTZycmJJmMbau/fvx85Ob+fCB1ZVy6XIz+fnsBGoVBg69atjFOe0WycPJm7s2Ba4FWHkpISFBQUoKCgAGKxGCKRCBERETS98PBwlVO1hoYGmkxdB0wgcGHszsJU/ZGFpaUlLRloSkoK7aPPzc3Fe++9hxUrVsDNzQ1nz56Fp6cnLCwsKHoffPABJY5iYGAAW7duxY4dO+Dq6oqQkBDK1uNwGJ0Fg+MbDZmGIwsmvv/+e8q2MvBkSuLo6MhbHwSCpoyLs2AKLhpELBZT1jR6enrg7+8Pd3d3rFy5Era2tli+fPnQFKGyshIymQyTJ0+mDa1ra2vh7OyMhQsXIjAwEGZmZkhMTATwZJGwoKCAMVkwAFy7do0mM9ZgZMF2/YAmWFpaYupUekZ1rpGlBMJ4wMM0xAQWU6i/+Dk5OawZqBwdHZGYmIgJEyYMyZRKJSQSCbKysmhD6M8++2xoeB4WFkYLOnr8+DHOnz+PvLw8SrCSrq4uUlJS4OzszGhHdnY25VlbWxs2ttwzed2/S792gCtaWlqYO3cudu3axbhwq8r5Egh/FLycDfGc70F5bmtrQ1FREav+xo0bcfnyZQiFQlYdGxsbZGZm4vPPP6fIk5OTkZ2djVdffZW1rlAoRGlpKcLDwxnLm5qacOkS9fCb4xxHxusDVNHe3o4bv9zkVGeQoqIi1NbWora2Fi0tLbhy5QolbmKQCxcu0BY+CYSnAS/5LDze8kTOSepCZXp6Ovz82LNJCYVCXL58GVVVVaipqUFNTQ06OzthY2ODN998E4sWLWJNu798+XIsXrwYlZWVQ3UFAgFsbGzg7e0NFxcXlfaeOnWKNrR393BX821/p7LiisY7MkzXFIykoaEBYWFhGrVPIPANL87CbvYsmJqZUrYR09LSsGXLFpW3sk+YMAFubm5wc+N+1FtfXx9eXl60EOnR6O3txc6dOykygUAAN3f2UQ4bknLmI/Rj5cGDBzh06BD27dsHqVQ6Ln0QCFzhxVkIBAJ4+yxE1omTQzKFQoFNmzapnI48DZKSkmih1g6ODpzDtvv6+vDTv1Vvzw4yWmpBhUKB5uZmSKVSSKVS1NXVsS7MjqSwsBA9PdQ7ZOvq6tSqSyBwgbe0ekErg1BceI5yGKu4uBhZWVkICQnhq5sxIZVKkZCQQJEJBAJErqWvFYzGhZILtGQ0bCQlJXFuX10kEglrkiACgU94y+6tr6+PiD+/Q5OvX78eN27c4Ksbjenr64NIJKKdzFzw9gLOOSkUCgW+/SaLT/MIhGceXu8N8fbxxsxZMymylpYWLF26FE1NTXx2xQmlUomoqCjalEhHR0ejUcW5wnNoblIvTyiB8KLAq7MQCAT4S+y7tMNV9fX18Pf3x2+//cZnd2qzZcsWWv4HAAhbHQqzV8w4tdXf349vT5BRBeHlg/frC2fOmomNf3t/KM3bIBKJBIsWLcK9e2MPYlKXnp4exMTEMOa38P4vbwStDOLcZuHZQrQ0t/BhHoHwXDEut6h7vOWBqHejaPKKigoIhUJaHsnxoKGhAV5eXhCLxbQyl7ku+Gvces5tShulOHYkjQ/zCITnjnFxFgCwLMAPgUH0DN/Nzc1YsmQJEhIS1N5N4IJSqcQ333wDoVCIyspKWvn0Gbb4IP5vlHBzddvdm7SXtk1JILwsjJuzAIA/R0UiODSYNiVRKBT49NNPYWdnh4MHD2qUdIaJvLw8CIVCrFq1ijFEeo7LHPz9f/7OOawbALKzclBbQ+IXCC8vrHEWRkbGaJQy56Xggu8SX9ja2iL/dD7jSOIfO/6B1KOpCAkJgaenJy2l/2g0NjaitLQUeXl5uH79OgBg+ozpFB2BQACPtzzg9Z9e6O7uQXc3t9FBV1cXbt+8DQ8Pj9GVCYTnGHNzc9YyAYChww0nT55EUBD3RT8CgfDicfz48eHXcvSO6zSEQCC8OFCmIb/88gvt6DaBQHg5uXmTmn6BMg0hEAgEFsg0hEAgqAdxFgQCQS3+H/5iYM4sITx1AAAAAElFTkSuQmCC\" height=\"20px\" alt=\"CC BY 3.0 AU\"></img></a></li>\r\n                    <li><a href=\"http://www.ga.gov.au/copyright\">Copyright</a></li>\r\n                    <li><a href=\"http://www.ga.gov.au/disclaimer\">Disclaimer</a></li>\r\n                    <li><a href=\"http://www.ga.gov.au/privacy\">Privacy</a></li>\r\n                    <li><a href=\"http://www.ga.gov.au/accessibility\">Accessibility</a></li>\r\n                    <li><a href=\"http://www.ga.gov.au/ips\">Information Publication Scheme</a></li>\r\n                    <li><a href=\"http://www.ga.gov.au/ips/foi\">Freedom of Information</a></li>\r\n                    <li class=\"contact\"><a href=\"http://www.ga.gov.au/contact-us\" target=\"_blank\">Contact us</a> </li>\r\n                </ul>\r\n            </div>\r\n        </div>\r\n    </div>\r\n</nav>");
@@ -2894,10 +2894,10 @@ $templateCache.put("components/header/header.html","<div class=\"container-full\
 $templateCache.put("components/header/loginheader.html","<div class=\"container-full\" style=\"padding-right:10px; padding-left:10px\">\r\n    <div class=\"navbar-header\">\r\n\r\n        <button type=\"button\" class=\"navbar-toggle\" data-toggle=\"collapse\" data-target=\".ga-header-collapse\">\r\n            <span class=\"sr-only\">Toggle navigation</span>\r\n            <span class=\"icon-bar\"></span>\r\n            <span class=\"icon-bar\"></span>\r\n            <span class=\"icon-bar\"></span>\r\n        </button>\r\n        <a href=\"http://www.ga.gov.au\" class=\"hidden-xs\"><img src=\"data:image/png;base64,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\" alt=\"Australian Government - Geoscience Australia\" class=\"logo\"></img></a>\r\n        <a href=\"http://www.ga.gov.au\" class=\"visible-xs\"><img src=\"data:image/png;base64,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\" alt=\"Australian Government - Geoscience Australia\" class=\"logo-stacked\"></img></a>\r\n        <a href=\"#/\" class=\"appTitle visible-xs\"><h1 style=\"font-size:120%\">{{heading}}</h1></a>\r\n    </div>\r\n    <div class=\"navbar-collapse collapse ga-header-collapse\">\r\n        <ul class=\"nav navbar-nav\">\r\n            <li class=\"hidden-xs\"><a href=\"#/\"><h1 class=\"applicationTitle\">{{heading}}</h1></a></li>\r\n        </ul>\r\n        <ul class=\"nav navbar-nav navbar-right\">				\r\n        	<li exp-web-user-details ng-show=\"username\" role=\"menuitem\" style=\"padding-right:10px\"></li>				\r\n        	<li exp-web-login ng-hide=\"username\" role=\"menuitem\" style=\"padding-right:10px\"></li>\r\n			<li mars-version-display role=\"menuitem\"></li>\r\n        </ul>\r\n        <div class=\"breadcrumbsContainer hidden-xs\">\r\n            <ul class=\"breadcrumbs\">\r\n                <li class=\"first\"><a href=\"/\">Home</a></li>\r\n                <li class=\"last\"><a class=\"ng-binding\" href=\"#/\">Explorer</a></li>\r\n            </ul>\r\n        </div>\r\n    </div><!--/.nav-collapse -->\r\n</div>\r\n\r\n<!-- Strap -->\r\n<div class=\"row\">\r\n    <div class=\"col-md-12\">\r\n        <div class=\"strap-blue\">\r\n        </div>\r\n        <div class=\"strap-white\">\r\n        </div>\r\n        <div class=\"strap-red\">\r\n        </div>\r\n    </div>\r\n</div>\r\n");
 $templateCache.put("components/info/info.html","<div class=\"marsinfo\" ng-show=\"isOpen\">\r\n	<div class=\"marsinfo-inner\">\r\n      <h3 ng-show=\"title\" ng-bind=\"title\" class=\"marsinfo-title\"></h3>\r\n      <div class=\"marsinfo-content\" ng-transclude></div>\r\n	</div>\r\n</div>");
 $templateCache.put("components/knob/knob.html","<input class=\"preset1\" type=\"range\" tabindex=\"-1\" style=\"position: absolute; top: -10000px;\" knob-handler>\r\n<svg version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\"  width=\"100%\" height=\"100%\" class=\"knob\" viewbox=\"0 0 200 200\" ng-attr-style=\"{{checkDisabled()}}\">\r\n	<defs>\r\n   		<filter id=\"{{knobShadow}}\" height=\"150%\" width=\"150%\">\r\n       		<feGaussianBlur in=\"SourceAlpha\" stdDeviation=\"2\"/>\r\n   	    	<feOffset dx=\"0\" dy=\"3\" result=\"offsetblur\"/>\r\n        	<feMerge>\r\n	   	        <feMergeNode/>\r\n    	   	    <feMergeNode in=\"SourceGraphic\"/>\r\n	       	</feMerge>\r\n	   	</filter>\r\n	</defs>\r\n	<circle cx=\"100\" cy=\"100\" r=\"60.606061\" ng-attr-style=\"filter:url(#{{knobShadow}});fill:{{config.circleColor}}\"></circle>\r\n	<rect x=\"97\" y=\"39.4\" width=\"6\" height=\"40\" class=\" pointer\" ng-attr-transform=\"rotate({{angle}} 100 100)\" ng-attr-fill={{config.pointerColor}}></rect>\r\n	<g class=\" scale\">\r\n		<text ng-repeat=\"tick in ticks\" x=\"95\" y=\"23.8\" width=\"10\" height=\"10\" \r\n				ng-attr-transform=\"rotate({{config.startAngle + $index * config.degrees + 3}} 100 100)\" style=\"text-anchor:middle\">{{tick}}</text>\r\n	</g>\r\n	<g>\r\n		<text y=\"175\" dy=\".71em\" x=\"100\" style=\"text-anchor:middle; font-weight:bold\">{{config.label}}</text>\r\n	</g>\r\n</svg>");
-$templateCache.put("components/legend/legend.html","<div>    \r\n    <div class=\"modal-header\" drag-parent parentClass=\"legendContainer\">\r\n        <h4 class=\"modal-title\">{{heading}}</h4>\r\n    </div>\r\n	<div class=\"legendImageContainer\" style=\"max-height:450px;overflow-y:auto; overflow-x:hidden;padding-bottom:5px\"> \r\n		<img ng-src=\"{{legend}}\"></img>\r\n	</div>\r\n</div>\r\n");
 $templateCache.put("components/login/login.html","<span class=\"badge\" title=\"Click to login\"><button class=\"undecorated\" ng-click=\"login()\">Login...</button></span>");
+$templateCache.put("components/legend/legend.html","<div>    \r\n    <div class=\"modal-header\" drag-parent parentClass=\"legendContainer\">\r\n        <h4 class=\"modal-title\">{{heading}}</h4>\r\n    </div>\r\n	<div class=\"legendImageContainer\" style=\"max-height:450px;overflow-y:auto; overflow-x:hidden;padding-bottom:5px\"> \r\n		<img ng-src=\"{{legend}}\"></img>\r\n	</div>\r\n</div>\r\n");
 $templateCache.put("components/message/messages.html","\r\n<span ng-controller=\"MessageController\" style=\"z-index:3\">\r\n  <span ng-show=\"historic.length > 10000\">\r\n    <a href=\"javascript:;\" title=\"Show recent messages\"><i class=\"fa fa-comments-o\" style=\"color:black\"></i></a>\r\n  </span>\r\n  <div ng-show=\"message\" class=\"alert\" role=\"alert\" \r\n  		ng-class=\'{\"alert-success\":(message.type==\"success\"),\"alert-info\":(message.type==\"info\"),\"alert-warning\":(message.type==\"warn\"),\"alert-danger\":(message.type==\"error\")}\'>\r\n    {{message.text}} <a href=\"javascript:;\" ng-click=\"removeMessage()\"><i class=\"fa fa-times-circle\" style=\"font-size:120%\"></i></a>\r\n  </div>\r\n</div>");
 $templateCache.put("components/modal/modal.html","<div class=\"exp-modal-outer\">\r\n	<div class=\"exp-backdrop fade  in\" ng-show=\"isModal && isOpen\" \r\n		ng-class=\"{in: animate}\"></div>\r\n	<div class=\"exp-modal\" ng-show=\"isOpen\" exp-modal-up>\r\n		<div class=\"exp-modal-inner\">\r\n    	  <div drag-parent parentClass=\"exp-modal-outer\" class=\"exp-modal-title\" ng-show=\"title\">\r\n      		<i class=\"fa\" ng-class=\"iconClass\"></i> \r\n      		<span ng-bind=\"title\"></span>\r\n      		<button title=\"Close popup dialog\" ng-click=\"isOpen=false\" class=\"exp-modal-close\" type=\"button\"><i class=\"fa fa-close\"></i></button> \r\n	      </div>      \r\n    	  <div class=\"exp-modal-content\" style=\"{{containerStyle}}\" ng-class=\"{\'exp-modal-no-title\':!title}\" ng-transclude></div>\r\n		</div>\r\n	</div>\r\n</div>");
 $templateCache.put("components/popover/popover.html","<div class=\"popover {{direction}}\" ng-class=\"containerClass\" ng-show=\"show\">\r\n  <div class=\"arrow\"></div>\r\n  <div class=\"popover-inner\" ng-transclude></div>\r\n</div>");
-$templateCache.put("components/version/versionDisplay.html","<span class=\"badge\">Version: {{version}}</span>\r\n");
-$templateCache.put("components/user/userdetails.html","<span class=\"badge\" title=\"Your are logged in\">Logon: {{username}}</span>");}]);
+$templateCache.put("components/user/userdetails.html","<span class=\"badge\" title=\"Your are logged in\">Logon: {{username}}</span>");
+$templateCache.put("components/version/versionDisplay.html","<span class=\"badge\">Version: {{version}}</span>\r\n");}]);

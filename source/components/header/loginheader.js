@@ -54,4 +54,4 @@ angular.module('exp.web.login.header', [])
 	};
 }]);
 
-})();
+})(angular);
