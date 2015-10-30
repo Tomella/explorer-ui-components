@@ -2,7 +2,7 @@
  * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
  */
 
-(function(angular) {
+(function(angular, window) {
 'use strict';
 
 /**
@@ -20,7 +20,7 @@ angular.module("exp.web.login", [])
 .directive('expWebLogin', ['loginService', function(loginService) {
 	return {
 		restrict : 'EA',
-		templateUrl : 'explorer/login/login.html',
+		templateUrl : 'components/login/login.html',
 		link : function(scope, element, attrs) {
 			scope.login = function() {
 				loginService.login();
@@ -81,4 +81,4 @@ loginService.login();
 	}];
 });
 
-})(angular);
+})(angular, window);

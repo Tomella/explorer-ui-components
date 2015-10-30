@@ -19,6 +19,24 @@ angular.module("explorer.user", [])
 	};
 }])
 
+
+.directive('expWebUserDetails', ['userService', '$rootScope', '$location', function(userService, $rootScope, $location) {
+	return {
+		restrict : 'EA',
+		templateUrl : 'components/user/userlogindetails.html',
+		link : function(scope, element, attrs) {
+			userService.getUsername().then(function(username){
+				scope.username = username;
+			});
+			
+			scope.logout = function() {
+				userService.logout();
+			};
+		}
+	};
+}])
+
+
 /**
  * @ngdoc interface
  * 
@@ -34,14 +52,19 @@ angular.module("explorer.user", [])
  */
 
 .provider("userService", function UserServiceProvider() {	
-	var baseUrl = 'service/appConfig/status';
+	var baseUrl = 'service/appConfig/status',
+		logoutUrl = 'j_spring_security_logout';
+	
+	this.logoutUrl = function(url) {
+		logoutUrl = url;
+	}
 	
 	// Change the url here
 	this.url = function(where) {
 		baseUrl = where;
 	};
 
-	this.$get = ['httpData', '$q', '$timeout', function(httpData, $q, $timeout) {
+	this.$get = ['$cookies', 'httpData', '$q', '$window', '$timeout', function($cookies, httpData, $q, $window, $timeout) {
 		var username;
 
 		function login() {
@@ -65,6 +88,11 @@ angular.module("explorer.user", [])
 		}
 		
 		return {
+			logout : function() {
+				$window.location.href = logoutUrl;
+				$cookies.remove("JSESSIONID");				
+			},
+			
 			login : function() {
 				login();
 			},
