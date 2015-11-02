@@ -26,10 +26,6 @@ angular.module('explorer.feature.indicator', ['explorer.projects'])
 			}
 			deferred = lastPromise = $q.defer(); 
 			projectsService.getCurrentProject().then(function(project) {
-				
-				// piggyback off explorer assets
-				project = "Explorer";
-
 				httpData.post(url, {
 						wkt:extents,
 						md5:md5,
