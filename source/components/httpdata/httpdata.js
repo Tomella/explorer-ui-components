@@ -39,6 +39,7 @@
                             if (result !== null) return result[1];
                         }
                     },
+                    fixUrl: fixUrl,
                     get: function (url, options) {
                         return $http.get(fixUrl(url), options);
                     },
