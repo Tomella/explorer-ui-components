@@ -57,7 +57,7 @@ angular.module("explorer.user", [])
 	
 	this.logoutUrl = function(url) {
 		logoutUrl = url;
-	}
+	};
 	
 	// Change the url here
 	this.url = function(where) {
