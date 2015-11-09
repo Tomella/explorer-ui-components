@@ -175,33 +175,6 @@ img.logo-stacked {
 .strap-red {
   background-color: #a33f1f;
 }
-.knob rect {
-  fill: #72C7E7;
-}
-
-.knob g polygon {
-  opacity: 1;
-}
-
-.knob circle {
-  fill: #A33F1F;
-  stroke: #793057;
-  stroke-width: 2;
-  filter: url("knob/#knobshadow");
-}
-
-.knob text {
-  font-size: 10px;
-  fill: black;
-  font-family: sans-serif;
-  font-weight: 300;
-  -webkit-transition: all .1s ease-in-out;
-}
-
-.knob text.active {
-  font-size: 15px;
-  -webkit-transition: all .3s ease-in-out;
-}
 .marsinfo {
   z-index: 1010;
   padding: 1px;
@@ -243,6 +216,33 @@ img.logo-stacked {
 .marsinfo.ng-hide-remove-active {
   /* the transition is defined in the active class */
   transition: 1s linear all;
+}
+.knob rect {
+  fill: #72C7E7;
+}
+
+.knob g polygon {
+  opacity: 1;
+}
+
+.knob circle {
+  fill: #A33F1F;
+  stroke: #793057;
+  stroke-width: 2;
+  filter: url("knob/#knobshadow");
+}
+
+.knob text {
+  font-size: 10px;
+  fill: black;
+  font-family: sans-serif;
+  font-weight: 300;
+  -webkit-transition: all .1s ease-in-out;
+}
+
+.knob text.active {
+  font-size: 15px;
+  -webkit-transition: all .3s ease-in-out;
 }
 .exp-modal {
   z-index: 1041;
@@ -309,95 +309,6 @@ img.logo-stacked {
 
 .exp-backdrop.in {
   opacity: 0.6;
-}
-.tabs-main {
-  position: absolute;
-  top: 0px;
-  bottom: 0px;
-  padding-top: 8px;
-  right: 0px;
-  background: #FFF;
-  -webkit-touch-callout: none;
-  -webkit-user-select: none;
-  -khtml-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  -o-user-select: none;
-  user-select: none;
-}
-
-#tabs-container {
-  position: absolute;
-  width: 9999px;
-  z-index: inherit;
-  /* keeps ie happy for mousemove events */
-  background: rgba(255, 255, 255, 0);
-}
-
-.rotate-tabs {
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 100%;
-  -webkit-transform: rotate(-90deg);
-  -moz-transform: rotate(-90deg);
-  -o-transform: rotate(-90deg);
-  -ms-transform: rotate(-90deg);
-  -sand-transform: rotate(90deg);
-  transform-origin: bottom right;
-  -webkit-transform-origin: bottom right;
-  -ms-transform-origin: bottom right;
-  display: block;
-}
-
-.tab-item {
-  float: right;
-  padding: 5px 15px 0px 15px;
-  border: 1px solid #999;
-  background: #FFF;
-  cursor: pointer;
-  height: 30px;
-}
-
-#tabs-content-container {
-  width: 550px;
-  right: 0;
-  top: 0;
-  bottom: 0;
-  position: absolute;
-  z-index: inherit;
-}
-
-#tabs-content-container .tab-content-item {
-  background: #FFF;
-  height: 100%;
-  overflow-y: auto;
-  overflow-x: hidden;
-}
-
-.x-resize {
-  position: absolute;
-  top: 0px;
-  left: 0px;
-  width: 4px;
-  bottom: 0px;
-  cursor: e-resize;
-  background: #CCC;
-  z-index: 1;
-}
-
-/* bg-splitter override look & feel */
-
-.split-panes.vertical > .split-handler {
-  background: #CCC !important;
-  border: none !important;
-}
-
-.split-panes.vertical > .split-handler:hover,
-.h-resize:hover {
-  background: #999 !important;
-}
-
-.split-panes {
-  background: #FFF;
 }
 .toggle-switch {
   display: inline-block;
@@ -507,6 +418,95 @@ img.logo-stacked {
   -o-transition: left 0.5s;
   -moz-transition: left 0.5s;
   -webkit-transition: left 0.5s;
+}
+.tabs-main {
+  position: absolute;
+  top: 0px;
+  bottom: 0px;
+  padding-top: 8px;
+  right: 0px;
+  background: #FFF;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -o-user-select: none;
+  user-select: none;
+}
+
+#tabs-container {
+  position: absolute;
+  width: 9999px;
+  z-index: inherit;
+  /* keeps ie happy for mousemove events */
+  background: rgba(255, 255, 255, 0);
+}
+
+.rotate-tabs {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 100%;
+  -webkit-transform: rotate(-90deg);
+  -moz-transform: rotate(-90deg);
+  -o-transform: rotate(-90deg);
+  -ms-transform: rotate(-90deg);
+  -sand-transform: rotate(90deg);
+  transform-origin: bottom right;
+  -webkit-transform-origin: bottom right;
+  -ms-transform-origin: bottom right;
+  display: block;
+}
+
+.tab-item {
+  float: right;
+  padding: 5px 15px 0px 15px;
+  border: 1px solid #999;
+  background: #FFF;
+  cursor: pointer;
+  height: 30px;
+}
+
+#tabs-content-container {
+  width: 550px;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  position: absolute;
+  z-index: inherit;
+}
+
+#tabs-content-container .tab-content-item {
+  background: #FFF;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.x-resize {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  width: 4px;
+  bottom: 0px;
+  cursor: e-resize;
+  background: #CCC;
+  z-index: 1;
+}
+
+/* bg-splitter override look & feel */
+
+.split-panes.vertical > .split-handler {
+  background: #CCC !important;
+  border: none !important;
+}
+
+.split-panes.vertical > .split-handler:hover,
+.h-resize:hover {
+  background: #999 !important;
+}
+
+.split-panes {
+  background: #FFF;
 }
 .tabs-left-main {
   position: absolute;

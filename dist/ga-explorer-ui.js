@@ -459,6 +459,35 @@ angular.module("explorer.confirm", ['ui.bootstrap', 'explorer.focusme'])
 	
 'use strict';
 
+angular.module("explorer.enter", [])
+
+.directive('expEnter', [function () {
+    return {
+    	scope : {
+    		expEnter : "&"
+    	},
+    	link : function (scope, element, attrs) {
+            element.on("keydown keypress", function (event) {
+            	if(event.which === 13) {
+            		scope.$apply(function (){
+            			scope.expEnter();
+            		});
+            		event.preventDefault();
+            	}
+            });
+    	}
+    };
+}]);
+
+})(angular);
+/*!
+ * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
+ */
+
+(function(angular) {
+	
+'use strict';
+
 angular.module('explorer.drag', [])
 
 .directive('dragParent', ['$document', '$timeout', function($document, $timeout) {
@@ -520,35 +549,6 @@ angular.module('explorer.drag', [])
         		$document.off('mousemove', mousemove);
         		$document.off('mouseup', mouseup);
         	}
-    	}
-    };
-}]);
-
-})(angular);
-/*!
- * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
- */
-
-(function(angular) {
-	
-'use strict';
-
-angular.module("explorer.enter", [])
-
-.directive('expEnter', [function () {
-    return {
-    	scope : {
-    		expEnter : "&"
-    	},
-    	link : function (scope, element, attrs) {
-            element.on("keydown keypress", function (event) {
-            	if(event.which === 13) {
-            		scope.$apply(function (){
-            			scope.expEnter();
-            		});
-            		event.preventDefault();
-            	}
-            });
     	}
     };
 }]);
@@ -734,50 +734,6 @@ angular.module("explorer.focusme", [])
 
 'use strict';
 
-angular.module('explorer.googleanalytics', [])
-
-.directive('expGa', ['$window', 'ga', function($window, ga) {
-	return {
-		restrict: 'A',
-		replace : false,
-		scope: {
-			expGa : "="
-		},
-		link: function(scope, element, attrs) {
-			var event = attrs.gaOn || 'click';
-			
- 		    if (event == 'init') {
- 			    send(scope.ga);
- 		    } else {
- 		    	element.on(event, send);
- 		    }
-    	   
-    	    function send() {
-    	    	ga(scope.expGa);
-    		}
-		}
-    };
-}])
-
-.factory('ga', ['$log', '$window', function ($log, $window) {
-    return function() {
-        if ($window.ga) {
-            $window.ga.apply(this, arguments);
-        } else {
-    		$log.warn("No Google Analytics");
-    		$log.warn(scope.expGa);
-    	}
-    };
-}]);
-
-})(angular);
-/*!
- * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
- */
-(function(angular) {
-
-'use strict';
-
 angular.module('page.footer', [])
 
 .directive('pageFooter', [function() {
@@ -829,6 +785,50 @@ angular.module('page.footer', [])
 	};
 }]);
 
+
+})(angular);
+/*!
+ * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
+ */
+(function(angular) {
+
+'use strict';
+
+angular.module('explorer.googleanalytics', [])
+
+.directive('expGa', ['$window', 'ga', function($window, ga) {
+	return {
+		restrict: 'A',
+		replace : false,
+		scope: {
+			expGa : "="
+		},
+		link: function(scope, element, attrs) {
+			var event = attrs.gaOn || 'click';
+			
+ 		    if (event == 'init') {
+ 			    send(scope.ga);
+ 		    } else {
+ 		    	element.on(event, send);
+ 		    }
+    	   
+    	    function send() {
+    	    	ga(scope.expGa);
+    		}
+		}
+    };
+}])
+
+.factory('ga', ['$log', '$window', function ($log, $window) {
+    return function() {
+        if ($window.ga) {
+            $window.ga.apply(this, arguments);
+        } else {
+    		$log.warn("No Google Analytics");
+    		$log.warn(scope.expGa);
+    	}
+    };
+}]);
 
 })(angular);
 /*!
@@ -1278,52 +1278,6 @@ angular.module("explorer.height.delta", [])
 /*!
  * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
  */
-(function(angular) {
-
-'use strict';
-
-angular.module("explorer.info", [])
-
-.directive("expInfo", ['$document', '$animate', function($document, $animate) {
-	return {
-		restrict: 'EA',
-	    transclude: true,
-	    replace:true,
-	    scope: { 
-	    	title: '@',  
-	    	isOpen: '=',
-			showClose: "="
-	    },
-	    templateUrl: 'components/info/info.html',
-	    link: function( scope, element ) {
-    		function keyupHandler(keyEvent) {
-    			if(keyEvent.which == 27) {
-    				keyEvent.stopPropagation();
-    				keyEvent.preventDefault();
-    				scope.$apply(function() {
-        				scope.isOpen = false;
-    				});
-    			}
-    		}
-			
-    		scope.$watch("isOpen", function(newValue) {
-    			if(newValue) {
-    				$document.on('keyup', keyupHandler);
-    			} else {
-    				$document.off('keyup', keyupHandler);
-    			}
-	    		scope.$on('$destroy', function () {
-	    		    $document.off('keyup', keyupHandler);
-	    		});
-	    	});
-	    }
-	};
-}]);
-
-})(angular);
-/*!
- * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
- */
 (function(angular, window) {
 
 'use strict';
@@ -1402,6 +1356,52 @@ angular.module('explorer.httpinterceptors.authentication', [])
 }]);
 
 })(angular, window);
+/*!
+ * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
+ */
+(function(angular) {
+
+'use strict';
+
+angular.module("explorer.info", [])
+
+.directive("expInfo", ['$document', '$animate', function($document, $animate) {
+	return {
+		restrict: 'EA',
+	    transclude: true,
+	    replace:true,
+	    scope: { 
+	    	title: '@',  
+	    	isOpen: '=',
+			showClose: "="
+	    },
+	    templateUrl: 'components/info/info.html',
+	    link: function( scope, element ) {
+    		function keyupHandler(keyEvent) {
+    			if(keyEvent.which == 27) {
+    				keyEvent.stopPropagation();
+    				keyEvent.preventDefault();
+    				scope.$apply(function() {
+        				scope.isOpen = false;
+    				});
+    			}
+    		}
+			
+    		scope.$watch("isOpen", function(newValue) {
+    			if(newValue) {
+    				$document.on('keyup', keyupHandler);
+    			} else {
+    				$document.off('keyup', keyupHandler);
+    			}
+	    		scope.$on('$destroy', function () {
+	    		    $document.off('keyup', keyupHandler);
+	    		});
+	    	});
+	    }
+	};
+}]);
+
+})(angular);
 /*!
  * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
  */
@@ -2436,6 +2436,61 @@ angular.module("nedf.splash", ['explorer.projects'])
 }]);
 
 })(angular, sessionStorage);
+/*!
+ * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
+ */
+(function(angular) {
+
+'use strict';
+
+angular.module('explorer.switch', [])
+
+.directive('explorerSwitch', [function () {
+	return {
+		restrict: 'EA',
+		scope: {
+			disabled: '=',
+			onLabel: '@',
+			offLabel: '@',
+			knobLabel: '@',
+			model: '='    	  
+		},
+    
+		template: '<div role="radio" class="toggle-switch" ng-class="{ \'disabled\': disabled }">' +
+        	'<div class="toggle-switch-animate" ng-class="{\'switch-off\': !model, \'switch-on\': model}">' +
+        	'<span class="switch-left switch-text" ng-bind="onLabel"></span>' +
+        	'<span class="switch-label-text" ng-bind="knobLabel"></span>' +
+        	'<span class="switch-right switch-text" ng-bind="offLabel"></span>' +
+        	'</div>' +
+        	'</div>',
+        link: function(scope, element){
+        	if(!scope.onLabel) { 
+        		scope.onLabel = 'On'; 
+        	}
+        	if(!scope.offLabel) { 
+        		scope.offLabel = 'Off'; 
+        	}
+        	if(!scope.knobLabel) { 
+        		scope.knobLabel = '\u00a0'; 
+        	}
+        	if(!scope.disabled) { 
+        		scope.disabled = false; 
+        	}
+
+        	element.on('click', function() {
+        		scope.$apply(scope.toggle);
+        	});
+        	
+        	scope.toggle = function toggle() {
+        		if(!scope.disabled) {
+    				scope.model = !scope.model;
+    			}
+    		};
+    	}
+  	};
+}]);
+
+})(angular);
 /**
  * @ngdoc object
  * @name explorer.tabs
@@ -2525,61 +2580,6 @@ angular.module('explorer.tabs', [])
 }]);
 
 })(angular);
-/*!
- * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
- */
-(function(angular) {
-
-'use strict';
-
-angular.module('explorer.switch', [])
-
-.directive('explorerSwitch', [function () {
-	return {
-		restrict: 'EA',
-		scope: {
-			disabled: '=',
-			onLabel: '@',
-			offLabel: '@',
-			knobLabel: '@',
-			model: '='    	  
-		},
-    
-		template: '<div role="radio" class="toggle-switch" ng-class="{ \'disabled\': disabled }">' +
-        	'<div class="toggle-switch-animate" ng-class="{\'switch-off\': !model, \'switch-on\': model}">' +
-        	'<span class="switch-left switch-text" ng-bind="onLabel"></span>' +
-        	'<span class="switch-label-text" ng-bind="knobLabel"></span>' +
-        	'<span class="switch-right switch-text" ng-bind="offLabel"></span>' +
-        	'</div>' +
-        	'</div>',
-        link: function(scope, element){
-        	if(!scope.onLabel) { 
-        		scope.onLabel = 'On'; 
-        	}
-        	if(!scope.offLabel) { 
-        		scope.offLabel = 'Off'; 
-        	}
-        	if(!scope.knobLabel) { 
-        		scope.knobLabel = '\u00a0'; 
-        	}
-        	if(!scope.disabled) { 
-        		scope.disabled = false; 
-        	}
-
-        	element.on('click', function() {
-        		scope.$apply(scope.toggle);
-        	});
-        	
-        	scope.toggle = function toggle() {
-        		if(!scope.disabled) {
-    				scope.model = !scope.model;
-    			}
-    		};
-    	}
-  	};
-}]);
-
-})(angular);
 /**
  * @ngdoc object
  * @name explorer.tabs.left
@@ -2660,6 +2660,38 @@ angular.module('explorer.tabs.left', [])
 	};
 	
 }]);
+/*!
+ * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
+ */
+(function(angular) {
+
+'use strict';
+
+angular.module('explorer.toolbar', [])
+
+.directive('expToolbar', [function() {
+	return {
+		restrict:'AE',
+		scope:true,
+		controller : ['$scope', function($scope) {
+			$scope.item = "";	
+			$scope.parameters = {};
+			
+			$scope.toggleItem = function(item) {
+				$scope.item = $scope.item == item?"":item;
+			};
+			
+			this.toggleItem = function(item) {
+				$scope.item = $scope.item == item?"":item;
+			};
+			this.currentItem = function() {
+				return $scope.item;
+			};
+		}]
+	};
+}]);
+
+})(angular);
 /*!
  * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
  */
@@ -2791,46 +2823,6 @@ angular.module("explorer.user", [])
  * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
  */
 (function(angular) {
-
-'use strict';
-
-angular.module("explorer.version", [])
-
-.directive('marsVersionDisplay', ['httpData', 'versionService', function(httpData, versionService) {
-	/**
-	 * CIAP theme switcher. Retrieves and stores the current theme to the theme service. 
-	 */
-	return {
-		templateUrl:'components/version/versionDisplay.html',
-		link : function(scope) {
-			httpData.get(versionService.url()).then(function(response) {
-				scope.version = response && response.data.version;
-			});
-		}
-	};	
-}])
-
-.provider("versionService", function VersionServiceProvider() {
-	var versionUrl = "service/appConfig/version";
-	
-	this.url = function(url) {
-		versionUrl = url;
-	};
-	
-	this.$get = function configServiceFactory() {
-		return {
-			url : function() {
-				return versionUrl;
-			}
-		};
-	};
-});
-
-})(angular);
-/*!
- * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
- */
-(function(angular) {
 	
 
 'use strict';
@@ -2887,29 +2879,37 @@ angular.module("explorer.waiting", [])
 
 'use strict';
 
-angular.module('explorer.toolbar', [])
+angular.module("explorer.version", [])
 
-.directive('expToolbar', [function() {
+.directive('marsVersionDisplay', ['httpData', 'versionService', function(httpData, versionService) {
+	/**
+	 * CIAP theme switcher. Retrieves and stores the current theme to the theme service. 
+	 */
 	return {
-		restrict:'AE',
-		scope:true,
-		controller : ['$scope', function($scope) {
-			$scope.item = "";	
-			$scope.parameters = {};
-			
-			$scope.toggleItem = function(item) {
-				$scope.item = $scope.item == item?"":item;
-			};
-			
-			this.toggleItem = function(item) {
-				$scope.item = $scope.item == item?"":item;
-			};
-			this.currentItem = function() {
-				return $scope.item;
-			};
-		}]
+		templateUrl:'components/version/versionDisplay.html',
+		link : function(scope) {
+			httpData.get(versionService.url()).then(function(response) {
+				scope.version = response && response.data.version;
+			});
+		}
+	};	
+}])
+
+.provider("versionService", function VersionServiceProvider() {
+	var versionUrl = "service/appConfig/version";
+	
+	this.url = function(url) {
+		versionUrl = url;
 	};
-}]);
+	
+	this.$get = function configServiceFactory() {
+		return {
+			url : function() {
+				return versionUrl;
+			}
+		};
+	};
+});
 
 })(angular);
 angular.module("exp.ui.templates", []).run(["$templateCache", function($templateCache) {$templateCache.put("components/confirm/confirm.html","<div class=\"modal-header\">\r\n   <h3 class=\"modal-title\" style=\"font-weight:bolder\">Confirm</h3>\r\n</div>\r\n<div class=\"modal-body\" id=\"accept\" style=\"width: 100%; margin-left: auto; margin-right: auto;\">\r\n	<div>\r\n		{{message}}\r\n	</div>	\r\n	<div style=\"text-align: right;padding-top:10px\">\r\n		<button type=\"button\" class=\"btn btn-default\" style=\"width:4em\" ng-click=\"accept()\" focus-me=\"true\">OK</button>\r\n		<button type=\"button\" class=\"btn btn-default\" style=\"width:4em\" ng-click=\"reject()\">Cancel</button>\r\n	</div>\r\n</div>");
