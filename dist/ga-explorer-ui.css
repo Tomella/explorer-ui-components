@@ -175,33 +175,6 @@ img.logo-stacked {
 .strap-red {
   background-color: #a33f1f;
 }
-.knob rect {
-  fill: #72C7E7;
-}
-
-.knob g polygon {
-  opacity: 1;
-}
-
-.knob circle {
-  fill: #A33F1F;
-  stroke: #793057;
-  stroke-width: 2;
-  filter: url("knob/#knobshadow");
-}
-
-.knob text {
-  font-size: 10px;
-  fill: black;
-  font-family: sans-serif;
-  font-weight: 300;
-  -webkit-transition: all .1s ease-in-out;
-}
-
-.knob text.active {
-  font-size: 15px;
-  -webkit-transition: all .3s ease-in-out;
-}
 .marsinfo {
   z-index: 1010;
   padding: 1px;
@@ -243,6 +216,33 @@ img.logo-stacked {
 .marsinfo.ng-hide-remove-active {
   /* the transition is defined in the active class */
   transition: 1s linear all;
+}
+.knob rect {
+  fill: #72C7E7;
+}
+
+.knob g polygon {
+  opacity: 1;
+}
+
+.knob circle {
+  fill: #A33F1F;
+  stroke: #793057;
+  stroke-width: 2;
+  filter: url("knob/#knobshadow");
+}
+
+.knob text {
+  font-size: 10px;
+  fill: black;
+  font-family: sans-serif;
+  font-weight: 300;
+  -webkit-transition: all .1s ease-in-out;
+}
+
+.knob text.active {
+  font-size: 15px;
+  -webkit-transition: all .3s ease-in-out;
 }
 .exp-modal {
   z-index: 1041;
