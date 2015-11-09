@@ -14,7 +14,8 @@ angular.module("explorer.info", [])
 	    replace:true,
 	    scope: { 
 	    	title: '@',  
-	    	isOpen: '='
+	    	isOpen: '=',
+			showClose: "="
 	    },
 	    templateUrl: 'components/info/info.html',
 	    link: function( scope, element ) {
@@ -27,7 +28,7 @@ angular.module("explorer.info", [])
     				});
     			}
     		}
-    		
+			
     		scope.$watch("isOpen", function(newValue) {
     			if(newValue) {
     				$document.on('keyup', keyupHandler);

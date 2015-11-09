@@ -1,6 +1,11 @@
 <div class="marsinfo" ng-show="isOpen">
 	<div class="marsinfo-inner">
-      <h3 ng-show="title" ng-bind="title" class="marsinfo-title"></h3>
+      <h3 ng-show="title" class="marsinfo-title">
+		  	<span  ng-bind="title"></span>
+		  	<span ng-show="showClose" class="pull-right">
+		 		<button type="button" class="undecorated" ng-click="isOpen = false"><i class="fa fa-close"></i></button>
+			</span>
+		</h3>
       <div class="marsinfo-content" ng-transclude></div>
 	</div>
 </div>
