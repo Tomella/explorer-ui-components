@@ -22,7 +22,7 @@
 					<line x1="50" y1="0" x2="50" y2="90" style="stroke:black" />
 					<text transform="rotate(-90) translate(-10)" y="6" dy=".71em" style="text-anchor:end">{{config.yLabel}}</text>
 					<g ng-repeat="tick in yTicks">
-						<text font-size="80%" style="text-anchor:end;" ng-attr-transform="translate(45 {{90 * (1 - (tick - minY)/ rangeY) +3}})">{{round(tick)}}</text>
+						<text font-size="80%" style="text-anchor:end;" ng-attr-transform="translate(45 {{90 * (1 - (tick - minY)/ rangeY) + 4}})">{{round(tick)}}</text>
 						<line x1="45" x2="50" ng-attr-y1="{{90 * (1 - (tick - minY)/ rangeY)}}" ng-attr-y2="{{90 * (1 - (tick - minY)/ rangeY)}}" style="stroke:black"></line>
 					</g>
 				</g>

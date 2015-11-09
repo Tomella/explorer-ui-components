@@ -173,8 +173,8 @@ angular.module("graph", [])
 					} else {
 						step = 20000;
 					}
-					
-					return d3.range(min - Math.abs(min % step) + step, max + (step - Math.abs(max % step)), step);			
+					return d3.range(Math.floor(min/step) * step + step, Math.floor(max/step) * step + step, step);
+					//return d3.range(min - Math.abs(min % step) + step, max + (step - Math.abs(max % step)), step);			
 				}
 			}
 		}
