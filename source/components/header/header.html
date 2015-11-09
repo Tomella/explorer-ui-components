@@ -24,6 +24,7 @@
         <div class="breadcrumbsContainer hidden-xs">
             <ul class="breadcrumbs">
                 <li class="first"><a href="/">Home</a></li>
+                <li ng-class="{last:$last}" ng-repeat="crumb in breadcrumbs"><a href="{{crumb.url}}" title="{{crumb.title}}" >{{crumb.name}}</a></li>
             </ul>
         </div>
     </div><!--/.nav-collapse -->

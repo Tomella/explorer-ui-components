@@ -34,6 +34,7 @@ angular.module('explorer.header', [])
 		restrict:'EA',
 		templateUrl:"components/header/header.html",
 		scope : {
+			breadcrumbs: "=",
 			heading: "=",
 			headingtitle:"=",
 			helpurl:"=",
