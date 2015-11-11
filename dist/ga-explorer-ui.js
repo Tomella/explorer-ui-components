@@ -71,46 +71,6 @@ angular.module('explorer.assets', ['explorer.projects'])
 /*!
  * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
  */
-
-(function(angular) {
-	
-'use strict';
-
-angular.module("explorer.broker", [])
-
-.factory("brokerService", ['$log', function($log) {
-	var listeners = {};
-	
-	return {
-		register : function(name, handler) {
-			if(!(name in listeners)) {
-				listeners[name] = {};
-			}
-			listeners[name][handler] = handler;
-		},
-		
-		deregister : function(name, handler) {
-			if(name in listeners && handler in listeners[name]) {
-				delete listeners[name][handler];
-			}
-		},
-		
-		route : function(message) {
-			if(message.jobName && listeners[message.jobName]) {
-				angular.forEach(listeners[message.jobName], function(handler) {
-					handler.process(message);
-				});
-			} else {
-				$log.debug("No handler found for " + message.jobName);
-			}
-		}
-	};
-}]);
-
-})(angular);
-/*!
- * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
- */
 (function(angular) {
 	
 
@@ -305,6 +265,46 @@ angular.module("explorer.asynch", [])
 	
 'use strict';
 
+angular.module("explorer.broker", [])
+
+.factory("brokerService", ['$log', function($log) {
+	var listeners = {};
+	
+	return {
+		register : function(name, handler) {
+			if(!(name in listeners)) {
+				listeners[name] = {};
+			}
+			listeners[name][handler] = handler;
+		},
+		
+		deregister : function(name, handler) {
+			if(name in listeners && handler in listeners[name]) {
+				delete listeners[name][handler];
+			}
+		},
+		
+		route : function(message) {
+			if(message.jobName && listeners[message.jobName]) {
+				angular.forEach(listeners[message.jobName], function(handler) {
+					handler.process(message);
+				});
+			} else {
+				$log.debug("No handler found for " + message.jobName);
+			}
+		}
+	};
+}]);
+
+})(angular);
+/*!
+ * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
+ */
+
+(function(angular) {
+	
+'use strict';
+
 angular.module("explorer.config", ['explorer.httpdata', 'explorer.waiting'])
 
 .provider("configService", function ConfigServiceProvider() {
@@ -459,6 +459,35 @@ angular.module("explorer.confirm", ['ui.bootstrap', 'explorer.focusme'])
 	
 'use strict';
 
+angular.module("explorer.enter", [])
+
+.directive('expEnter', [function () {
+    return {
+    	scope : {
+    		expEnter : "&"
+    	},
+    	link : function (scope, element, attrs) {
+            element.on("keydown keypress", function (event) {
+            	if(event.which === 13) {
+            		scope.$apply(function (){
+            			scope.expEnter();
+            		});
+            		event.preventDefault();
+            	}
+            });
+    	}
+    };
+}]);
+
+})(angular);
+/*!
+ * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
+ */
+
+(function(angular) {
+	
+'use strict';
+
 angular.module('explorer.drag', [])
 
 .directive('dragParent', ['$document', '$timeout', function($document, $timeout) {
@@ -520,35 +549,6 @@ angular.module('explorer.drag', [])
         		$document.off('mousemove', mousemove);
         		$document.off('mouseup', mouseup);
         	}
-    	}
-    };
-}]);
-
-})(angular);
-/*!
- * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
- */
-
-(function(angular) {
-	
-'use strict';
-
-angular.module("explorer.enter", [])
-
-.directive('expEnter', [function () {
-    return {
-    	scope : {
-    		expEnter : "&"
-    	},
-    	link : function (scope, element, attrs) {
-            element.on("keydown keypress", function (event) {
-            	if(event.which === 13) {
-            		scope.$apply(function (){
-            			scope.expEnter();
-            		});
-            		event.preventDefault();
-            	}
-            });
     	}
     };
 }]);
@@ -2696,6 +2696,46 @@ angular.module('explorer.toolbar', [])
 /*!
  * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
  */
+(function(angular) {
+
+'use strict';
+
+angular.module("explorer.version", [])
+
+.directive('marsVersionDisplay', ['httpData', 'versionService', function(httpData, versionService) {
+	/**
+	 * CIAP theme switcher. Retrieves and stores the current theme to the theme service. 
+	 */
+	return {
+		templateUrl:'components/version/versionDisplay.html',
+		link : function(scope) {
+			httpData.get(versionService.url()).then(function(response) {
+				scope.version = response && response.data.version;
+			});
+		}
+	};	
+}])
+
+.provider("versionService", function VersionServiceProvider() {
+	var versionUrl = "service/appConfig/version";
+	
+	this.url = function(url) {
+		versionUrl = url;
+	};
+	
+	this.$get = function configServiceFactory() {
+		return {
+			url : function() {
+				return versionUrl;
+			}
+		};
+	};
+});
+
+})(angular);
+/*!
+ * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
+ */
 (function(angular, sessionStorage, window) {
 
 'use strict';
@@ -2824,46 +2864,6 @@ angular.module("explorer.user", [])
  * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
  */
 (function(angular) {
-
-'use strict';
-
-angular.module("explorer.version", [])
-
-.directive('marsVersionDisplay', ['httpData', 'versionService', function(httpData, versionService) {
-	/**
-	 * CIAP theme switcher. Retrieves and stores the current theme to the theme service. 
-	 */
-	return {
-		templateUrl:'components/version/versionDisplay.html',
-		link : function(scope) {
-			httpData.get(versionService.url()).then(function(response) {
-				scope.version = response && response.data.version;
-			});
-		}
-	};	
-}])
-
-.provider("versionService", function VersionServiceProvider() {
-	var versionUrl = "service/appConfig/version";
-	
-	this.url = function(url) {
-		versionUrl = url;
-	};
-	
-	this.$get = function configServiceFactory() {
-		return {
-			url : function() {
-				return versionUrl;
-			}
-		};
-	};
-});
-
-})(angular);
-/*!
- * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
- */
-(function(angular) {
 	
 
 'use strict';
@@ -2926,6 +2926,6 @@ $templateCache.put("components/login/login.html","<span class=\"badge\" title=\"
 $templateCache.put("components/message/messages.html","\r\n<span ng-controller=\"MessageController\" style=\"z-index:3\">\r\n  <span ng-show=\"historic.length > 10000\">\r\n    <a href=\"javascript:;\" title=\"Show recent messages\"><i class=\"fa fa-comments-o\" style=\"color:black\"></i></a>\r\n  </span>\r\n  <div ng-show=\"message\" class=\"alert\" role=\"alert\" \r\n  		ng-class=\'{\"alert-success\":(message.type==\"success\"),\"alert-info\":(message.type==\"info\"),\"alert-warning\":(message.type==\"warn\"),\"alert-danger\":(message.type==\"error\")}\'>\r\n    {{message.text}} <a href=\"javascript:;\" ng-click=\"removeMessage()\"><i class=\"fa fa-times-circle\" style=\"font-size:120%\"></i></a>\r\n  </div>\r\n</div>");
 $templateCache.put("components/modal/modal.html","<div class=\"exp-modal-outer\">\r\n	<div class=\"exp-backdrop fade  in\" ng-show=\"isModal && isOpen\" \r\n		ng-class=\"{in: animate}\"></div>\r\n	<div class=\"exp-modal\" ng-show=\"isOpen\" exp-modal-up>\r\n		<div class=\"exp-modal-inner\">\r\n    	  <div drag-parent parentClass=\"exp-modal-outer\" class=\"exp-modal-title\" ng-show=\"title\">\r\n      		<i class=\"fa\" ng-class=\"iconClass\"></i> \r\n      		<span ng-bind=\"title\"></span>\r\n      		<button title=\"Close popup dialog\" ng-click=\"isOpen=false\" class=\"exp-modal-close\" type=\"button\"><i class=\"fa fa-close\"></i></button> \r\n	      </div>      \r\n    	  <div class=\"exp-modal-content\" style=\"{{containerStyle}}\" ng-class=\"{\'exp-modal-no-title\':!title}\" ng-transclude></div>\r\n		</div>\r\n	</div>\r\n</div>");
 $templateCache.put("components/popover/popover.html","<div class=\"popover {{direction}}\" ng-class=\"containerClass\" ng-show=\"show\">\r\n  <div class=\"arrow\"></div>\r\n  <div class=\"popover-inner\" ng-transclude></div>\r\n</div>");
+$templateCache.put("components/version/versionDisplay.html","<span class=\"badge\">Version: {{version}}</span>\r\n");
 $templateCache.put("components/user/userdetails.html","<span class=\"badge\" title=\"Your are logged in\">Logon: {{username}}</span>");
-$templateCache.put("components/user/userlogindetails.html","<span class=\"badge\" title=\"You are logged in\">\r\n	Logon: {{username}}\r\n	<button class=\"undecorated\" ng-click=\"logout()\" style=\"padding-left:10px\" title=\"Click to logout\">\r\n		<i class=\"fa fa-close fa-lg\"></i>\r\n	</button>\r\n</span>");
-$templateCache.put("components/version/versionDisplay.html","<span class=\"badge\">Version: {{version}}</span>\r\n");}]);
+$templateCache.put("components/user/userlogindetails.html","<span class=\"badge\" title=\"You are logged in\">\r\n	Logon: {{username}}\r\n	<button class=\"undecorated\" ng-click=\"logout()\" style=\"padding-left:10px\" title=\"Click to logout\">\r\n		<i class=\"fa fa-close fa-lg\"></i>\r\n	</button>\r\n</span>");}]);
