@@ -13,6 +13,7 @@ angular.module("explorer.config", ['explorer.httpdata', 'explorer.waiting'])
 		dynamicConfigUrl = "service/appConfig/config?t=",
 		persistedConfig,
 		waiters,
+        dynamicAttributes = [],
 		now = Date.now() % 10000000;
 	
 	this.location = function(where) {
@@ -22,7 +23,11 @@ angular.module("explorer.config", ['explorer.httpdata', 'explorer.waiting'])
 	this.dynamicLocation = function(where) {
 		dynamicConfigUrl = where;
 	};
-	
+
+    this.dynamicAttributes = function(attrs) {
+        dynamicAttributes = attrs;
+    };
+
 	this.$get = ['$q', 'httpData', 'waiting', function configServiceFactory($q, httpData, waiting) {
 		var $config =  {
 			getConfig : function(child) {
@@ -58,6 +63,9 @@ angular.module("explorer.config", ['explorer.httpdata', 'explorer.waiting'])
                                     var data = response && response.data;
                                     config.clientSessionId = data.clientSessionId;
                                     config.version = data.version;
+                                    dynamicAttributes.forEach(function(attr) {
+                                        config[attr] = data[attr];
+                                    });
 									decorateAndResolve();
 								});								
 							} else {
