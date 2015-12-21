@@ -1,9 +1,10 @@
 /*!
  * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
  */
-(function(angular, sessionStorage) {
+(function(angular, indexedDB, localStorage, sessionStorage) {
 
 'use strict';
+var prefix = "mars.anon";
 
 angular.module("explorer.persist", ['explorer.projects'])
 
@@ -17,10 +18,14 @@ angular.module("explorer.persist", ['explorer.projects'])
 			return persistRemoteService;
 		}
 	}];
-		
-	this.handler = function(name) {
-		handle = name;
-	};
+
+    this.handler = function(name) {
+        handle = name;
+    };
+
+    this.prefix = function(name) {
+        prefix = name;
+    };
 })
 
 .factory("persistRemoteService", ['$log', '$q', 'projectsService', 'serverPersistService', 'userService', function($log, $q, projectsService, serverPersistService, userService) {
@@ -124,49 +129,80 @@ angular.module("explorer.persist", ['explorer.projects'])
 }])
 
 .factory("persistLocalService", ['$log', '$q', 'projectsService', function($log, $q, projectsService) {
-	return {
+        var db, store = "Store";
+        if (indexedDB) {
+            var request = indexedDB.open("GAExplorer." + prefix);
+            request.onupgradeneeded = function() {
+                request.result.createObjectStore(store);
+            };
+            request.onsuccess = function() {
+                db = request.result;
+            };
+        }
+
+        function doGetItem(project, key) {
+            key = project + "." + key;
+            $log.debug("Fetching state locally for key " + key);
+            if (!db) {
+                var item = localStorage.getItem(prefix + "." + key);
+                if (item) {
+                    try {
+                        item = JSON.parse(item);
+                    } catch (e) {
+                        // Do nothing as it will be a string
+                    }
+                }
+                return $q.when(item);
+            }
+
+            var req = db.transaction(store).objectStore(store).get(key), deferred = $q.defer();
+            req.onsuccess = function() {
+                deferred.resolve(req.result);
+            };
+            req.onerror = function() {
+                deferred.resolve(null);
+            };
+            return deferred.promise;
+        }
+
+        function doSetItem(project, key, value) {
+            key = project + "." + key;
+            $log.debug("Setting state for key locally" + key);
+            if (!db)
+                return localStorage.setItem(prefix + "." + key, JSON.stringify(value));
+
+            var req = db.transaction(store, "readwrite").objectStore(store);
+            if (value !== null)
+                req.put(value, key);
+            else
+                req.delete(key);
+        }
+
+        return {
 		setGlobalItem : function(key, value) {
-			this._setItem("_system", key, value);
+            doSetItem("_system", key, value);
 		},
 		
 		setItem : function(key, value) {
 			projectsService.getCurrentProject().then(function(project) {
-				this._setItem(project, key, value);
-			}.bind(this));
+                doSetItem(project, key, value);
+			});
 		},
 		
-		_setItem : function(project, key, value) {
-			$log.debug("Fetching state for key locally" + key);
-			localStorage.setItem("mars.anon." + project + "." + key, JSON.stringify(value));
-		},
-
 		getGlobalItem : function(key) {
-			return this._getItem("_system", key);
+			return doGetItem("_system", key);
 		},
 		
 		getItem : function(key) {
 			var deferred = $q.defer();
 			projectsService.getCurrentProject().then(function(project) {
-				this._getItem(project, key).then(function(response) {
+                doGetItem(project, key).then(function(response) {
 					deferred.resolve(response);
 				});
-			}.bind(this));
+			});
 			return deferred.promise;
-		},
-		
-		_getItem : function(project, key) {
-			$log.debug("Fetching state locally for key " + key);
-			var item = localStorage.getItem("mars.anon." + project + "." + key);
-			if(item) {
-				try {
-					item = JSON.parse(item);
-				} catch(e) {
-					// Do nothing as it will be a string
-				}
-			}
-			return $q.when(item);			
-		}		
+		}
 	};
 }]);
 
-})(angular, localStorage, sessionStorage);
+})(angular, indexedDB || mozIndexedDB || webkitIndexedDB || msIndexedDB, localStorage, sessionStorage);
