@@ -5,7 +5,7 @@
   "main" : [
       "dist/ga-explorer-ui.js",
       "dist/ga-explorer-ui.css"
-  ]
+  ],
   "keywords": [
     "angularjs"
   ],
