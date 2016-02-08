@@ -71,46 +71,6 @@ angular.module('explorer.assets', ['explorer.projects'])
 /*!
  * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
  */
-
-(function(angular) {
-	
-'use strict';
-
-angular.module("explorer.broker", [])
-
-.factory("brokerService", ['$log', function($log) {
-	var listeners = {};
-	
-	return {
-		register : function(name, handler) {
-			if(!(name in listeners)) {
-				listeners[name] = {};
-			}
-			listeners[name][handler] = handler;
-		},
-		
-		deregister : function(name, handler) {
-			if(name in listeners && handler in listeners[name]) {
-				delete listeners[name][handler];
-			}
-		},
-		
-		route : function(message) {
-			if(message.jobName && listeners[message.jobName]) {
-				angular.forEach(listeners[message.jobName], function(handler) {
-					handler.process(message);
-				});
-			} else {
-				$log.debug("No handler found for " + message.jobName);
-			}
-		}
-	};
-}]);
-
-})(angular);
-/*!
- * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
- */
 (function(angular) {
 	
 
@@ -305,6 +265,116 @@ angular.module("explorer.asynch", [])
 	
 'use strict';
 
+angular.module("explorer.broker", [])
+
+.factory("brokerService", ['$log', function($log) {
+	var listeners = {};
+	
+	return {
+		register : function(name, handler) {
+			if(!(name in listeners)) {
+				listeners[name] = {};
+			}
+			listeners[name][handler] = handler;
+		},
+		
+		deregister : function(name, handler) {
+			if(name in listeners && handler in listeners[name]) {
+				delete listeners[name][handler];
+			}
+		},
+		
+		route : function(message) {
+			if(message.jobName && listeners[message.jobName]) {
+				angular.forEach(listeners[message.jobName], function(handler) {
+					handler.process(message);
+				});
+			} else {
+				$log.debug("No handler found for " + message.jobName);
+			}
+		}
+	};
+}]);
+
+})(angular);
+/*!
+ * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
+ */
+
+(function(angular) {
+'use strict';
+
+angular.module("explorer.confirm", ['ui.bootstrap', 'explorer.focusme'])
+
+.directive("expConfirm", ['confirmService', function(confirmService) {
+	return {
+		scope : {
+			success : "&",
+			cancel : "&",
+			expConfirm : "="
+		},
+		link : function(scope, element) {			
+			element.on("click", function(event) {
+				confirmService.confirm(scope);
+			});
+		}
+	};	
+}])
+
+.factory("confirmService", ['$log', '$modal', function($log, $modal) {
+	return {
+		confirm : function(details) {
+			var modalInstance;
+
+			details.confirmed = false;
+			modalInstance = $modal.open({
+				templateUrl: 'components/confirm/confirm.html',
+				size: "sm",
+				backdrop : "static",
+				keyboard : false,
+				controller : ['$scope', '$modalInstance', 'message', function ($scope, $modalInstance, message) {
+					$scope.message = message;
+
+					$scope.accept = function () {
+					   $modalInstance.close(true);
+					};
+					  
+					$scope.reject = function () {
+					   $modalInstance.close(false);
+					};
+				}],
+				resolve: {
+					message : function() {
+						return details.expConfirm;
+					}
+				}
+			}); 
+
+			modalInstance.opened.then(function() {
+				// Maybe do something about the focus here
+			});
+			
+		    modalInstance.result.then(function (confirmed) {
+		    	$log.info("Confirmed : " + confirmed);
+		        if(confirmed) {
+		        	details.success();
+		        } else if(details.cancel){
+		        	details.cancel();
+		        }
+		    });
+		}
+	};
+}]);
+
+})(angular);
+/*!
+ * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
+ */
+
+(function(angular) {
+	
+'use strict';
+
 angular.module("explorer.config", ['explorer.httpdata', 'explorer.waiting'])
 
 .provider("configService", function ConfigServiceProvider() {
@@ -387,76 +457,6 @@ angular.module("explorer.config", ['explorer.httpdata', 'explorer.waiting'])
 		return $config;		
 	}];
 });
-
-})(angular);
-/*!
- * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
- */
-
-(function(angular) {
-'use strict';
-
-angular.module("explorer.confirm", ['ui.bootstrap', 'explorer.focusme'])
-
-.directive("expConfirm", ['confirmService', function(confirmService) {
-	return {
-		scope : {
-			success : "&",
-			cancel : "&",
-			expConfirm : "="
-		},
-		link : function(scope, element) {			
-			element.on("click", function(event) {
-				confirmService.confirm(scope);
-			});
-		}
-	};	
-}])
-
-.factory("confirmService", ['$log', '$modal', function($log, $modal) {
-	return {
-		confirm : function(details) {
-			var modalInstance;
-
-			details.confirmed = false;
-			modalInstance = $modal.open({
-				templateUrl: 'components/confirm/confirm.html',
-				size: "sm",
-				backdrop : "static",
-				keyboard : false,
-				controller : ['$scope', '$modalInstance', 'message', function ($scope, $modalInstance, message) {
-					$scope.message = message;
-
-					$scope.accept = function () {
-					   $modalInstance.close(true);
-					};
-					  
-					$scope.reject = function () {
-					   $modalInstance.close(false);
-					};
-				}],
-				resolve: {
-					message : function() {
-						return details.expConfirm;
-					}
-				}
-			}); 
-
-			modalInstance.opened.then(function() {
-				// Maybe do something about the focus here
-			});
-			
-		    modalInstance.result.then(function (confirmed) {
-		    	$log.info("Confirmed : " + confirmed);
-		        if(confirmed) {
-		        	details.success();
-		        } else if(details.cancel){
-		        	details.cancel();
-		        }
-		    });
-		}
-	};
-}]);
 
 })(angular);
 /*!
@@ -565,80 +565,6 @@ angular.module("explorer.enter", [])
 /*!
  * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
  */
-(function(angular, JSON) {
-
-'use strict';
-
-angular.module('explorer.feature.indicator', ['explorer.projects'])
-
-.factory('indicatorService', ['$log', '$q', '$rootScope', 'httpData', 'projectsService', 'assetsService', function($log, $q, $rootScope, httpData, projectsService, assetsService) {
-	// Maybe we should set up a configuration service
-	var url = "service/asset/counts",
-		lastPromise = null,
-		md5 = null,
-		lastTime = null;
-	return {		
-		
-		checkImpact : function(extents) {
-			var deferred, startTime;
-			
-			startTime = lastTime = new Date();
-			
-			if(lastPromise) {
-				// Get rid of the last one as it is usurped. 
-				lastPromise.resolve(null);
-			}
-			deferred = lastPromise = $q.defer(); 
-			projectsService.getCurrentProject().then(function(project) {
-				httpData.post(url, {
-						wkt:extents,
-						md5:md5,
-						project:project
-				}).then(function (response) {
-                    var data = response.data, status = response.status;
-					// If a subsequent request has come in we don't want to update
-					// the counts but there is no cancel on a http request.
-					if(startTime == lastTime && data.refreshRequired) {
-						if(status == 200) {
-							assetsService.getAssets().then(function(assets) {
-								var countMap = data.countMap;
-								md5 = data.md5;
-								angular.forEach(assets, function(asset, key) {
-									if(countMap[key]) {
-										asset.count = countMap[key];
-									} else {
-										asset.count = 0;
-									}
-								});
-							});
-						} else {
-							var message = "We have problem checking indicators.";
-							if(data) {
-								if(angular.isString(data)) {
-									message = JSON.parse(data);
-								}
-								if(data.error) {
-									message = data.error;
-								}
-							}
-							// $log.debug(message);
-						}
-					} else {
-						// $log.debug("This check does not need applying.");
-					}
-					deferred.resolve(data);
-					lastPromise = null;
-				});
-			});
-			return deferred.promise;
-		}
-	};
-}]);
-
-})(angular, JSON);
-/*!
- * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
- */
 
 (function(angular) {
 
@@ -710,6 +636,80 @@ angular.module("explorer.flasher", [])
 }]);
 
 })(angular);
+/*!
+ * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
+ */
+(function(angular, JSON) {
+
+'use strict';
+
+angular.module('explorer.feature.indicator', ['explorer.projects'])
+
+.factory('indicatorService', ['$log', '$q', '$rootScope', 'httpData', 'projectsService', 'assetsService', function($log, $q, $rootScope, httpData, projectsService, assetsService) {
+	// Maybe we should set up a configuration service
+	var url = "service/asset/counts",
+		lastPromise = null,
+		md5 = null,
+		lastTime = null;
+	return {		
+		
+		checkImpact : function(extents) {
+			var deferred, startTime;
+			
+			startTime = lastTime = new Date();
+			
+			if(lastPromise) {
+				// Get rid of the last one as it is usurped. 
+				lastPromise.resolve(null);
+			}
+			deferred = lastPromise = $q.defer(); 
+			projectsService.getCurrentProject().then(function(project) {
+				httpData.post(url, {
+						wkt:extents,
+						md5:md5,
+						project:project
+				}).then(function (response) {
+                    var data = response.data, status = response.status;
+					// If a subsequent request has come in we don't want to update
+					// the counts but there is no cancel on a http request.
+					if(startTime == lastTime && data.refreshRequired) {
+						if(status == 200) {
+							assetsService.getAssets().then(function(assets) {
+								var countMap = data.countMap;
+								md5 = data.md5;
+								angular.forEach(assets, function(asset, key) {
+									if(countMap[key]) {
+										asset.count = countMap[key];
+									} else {
+										asset.count = 0;
+									}
+								});
+							});
+						} else {
+							var message = "We have problem checking indicators.";
+							if(data) {
+								if(angular.isString(data)) {
+									message = JSON.parse(data);
+								}
+								if(data.error) {
+									message = data.error;
+								}
+							}
+							// $log.debug(message);
+						}
+					} else {
+						// $log.debug("This check does not need applying.");
+					}
+					deferred.resolve(data);
+					lastPromise = null;
+				});
+			});
+			return deferred.promise;
+		}
+	};
+}]);
+
+})(angular, JSON);
 /*!
  * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
  */
@@ -793,50 +793,6 @@ angular.module('page.footer', [])
 	};
 }]);
 
-
-})(angular);
-/*!
- * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
- */
-(function(angular) {
-
-'use strict';
-
-angular.module('explorer.googleanalytics', [])
-
-.directive('expGa', ['$window', 'ga', function($window, ga) {
-	return {
-		restrict: 'A',
-		replace : false,
-		scope: {
-			expGa : "="
-		},
-		link: function(scope, element, attrs) {
-			var event = attrs.gaOn || 'click';
-			
- 		    if (event == 'init') {
- 			    send(scope.ga);
- 		    } else {
- 		    	element.on(event, send);
- 		    }
-    	   
-    	    function send() {
-    	    	ga(scope.expGa);
-    		}
-		}
-    };
-}])
-
-.factory('ga', ['$log', '$window', function ($log, $window) {
-    return function() {
-        if ($window.ga) {
-            $window.ga.apply(this, arguments);
-        } else {
-    		$log.warn("No Google Analytics");
-    		$log.warn(scope.expGa);
-    	}
-    };
-}]);
 
 })(angular);
 /*!
@@ -1083,6 +1039,50 @@ angular.module("graph", [])
 
 'use strict';
 
+angular.module('explorer.googleanalytics', [])
+
+.directive('expGa', ['$window', 'ga', function($window, ga) {
+	return {
+		restrict: 'A',
+		replace : false,
+		scope: {
+			expGa : "="
+		},
+		link: function(scope, element, attrs) {
+			var event = attrs.gaOn || 'click';
+			
+ 		    if (event == 'init') {
+ 			    send(scope.ga);
+ 		    } else {
+ 		    	element.on(event, send);
+ 		    }
+    	   
+    	    function send() {
+    	    	ga(scope.expGa);
+    		}
+		}
+    };
+}])
+
+.factory('ga', ['$log', '$window', function ($log, $window) {
+    return function() {
+        if ($window.ga) {
+            $window.ga.apply(this, arguments);
+        } else {
+    		$log.warn("No Google Analytics");
+    		$log.warn(scope.expGa);
+    	}
+    };
+}]);
+
+})(angular);
+/*!
+ * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
+ */
+(function(angular) {
+
+'use strict';
+
 angular.module('explorer.header', [])
 
 .controller('headerController', [ '$scope', '$q', '$timeout', function ($scope, $q, $timeout) {
@@ -1287,6 +1287,52 @@ angular.module("explorer.height.delta", [])
 /*!
  * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
  */
+(function(angular) {
+
+'use strict';
+
+angular.module("explorer.info", [])
+
+.directive("expInfo", ['$document', '$animate', function($document, $animate) {
+	return {
+		restrict: 'EA',
+	    transclude: true,
+	    replace:true,
+	    scope: { 
+	    	title: '@',  
+	    	isOpen: '=',
+			showClose: "="
+	    },
+	    templateUrl: 'components/info/info.html',
+	    link: function( scope, element ) {
+    		function keyupHandler(keyEvent) {
+    			if(keyEvent.which == 27) {
+    				keyEvent.stopPropagation();
+    				keyEvent.preventDefault();
+    				scope.$apply(function() {
+        				scope.isOpen = false;
+    				});
+    			}
+    		}
+			
+    		scope.$watch("isOpen", function(newValue) {
+    			if(newValue) {
+    				$document.on('keyup', keyupHandler);
+    			} else {
+    				$document.off('keyup', keyupHandler);
+    			}
+	    		scope.$on('$destroy', function () {
+	    		    $document.off('keyup', keyupHandler);
+	    		});
+	    	});
+	    }
+	};
+}]);
+
+})(angular);
+/*!
+ * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
+ */
 (function(angular, window) {
 
 'use strict';
@@ -1365,52 +1411,6 @@ angular.module('explorer.httpinterceptors.authentication', [])
 }]);
 
 })(angular, window);
-/*!
- * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
- */
-(function(angular) {
-
-'use strict';
-
-angular.module("explorer.info", [])
-
-.directive("expInfo", ['$document', '$animate', function($document, $animate) {
-	return {
-		restrict: 'EA',
-	    transclude: true,
-	    replace:true,
-	    scope: { 
-	    	title: '@',  
-	    	isOpen: '=',
-			showClose: "="
-	    },
-	    templateUrl: 'components/info/info.html',
-	    link: function( scope, element ) {
-    		function keyupHandler(keyEvent) {
-    			if(keyEvent.which == 27) {
-    				keyEvent.stopPropagation();
-    				keyEvent.preventDefault();
-    				scope.$apply(function() {
-        				scope.isOpen = false;
-    				});
-    			}
-    		}
-			
-    		scope.$watch("isOpen", function(newValue) {
-    			if(newValue) {
-    				$document.on('keyup', keyupHandler);
-    			} else {
-    				$document.off('keyup', keyupHandler);
-    			}
-	    		scope.$on('$destroy', function () {
-	    		    $document.off('keyup', keyupHandler);
-	    		});
-	    	});
-	    }
-	};
-}]);
-
-})(angular);
 /*!
  * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
  */
@@ -1784,21 +1784,15 @@ angular.module("explorer.message", [])
 	$scope.historic = [];
 	
 	$rootScope.$on('message.posted', function(event, message) {
-		var phase = $scope.$root.$$phase;
-		if(phase == '$apply' || phase == '$digest') {
+		$timeout(function() {
 			$scope.message = message;
-		} else {
-		   this.$apply(function() {
-				$scope.message = message;
-			});
-		}
-		
-		$timeout.cancel($scope.timeout);
-		$scope.timeout = $timeout(function() {
-			$scope.$apply(function() {
-				$scope.removeMessage();
-			});
-		}, $scope.persistDuration);
+			$timeout.cancel($scope.timeout);
+			$scope.timeout = $timeout(function() {
+				$scope.$apply(function() {
+					$scope.removeMessage();
+				});
+			}, $scope.persistDuration);
+		});
 	});
 	
 	$rootScope.$on("message.cleared", $scope.removeMessage);

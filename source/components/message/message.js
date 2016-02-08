@@ -52,21 +52,15 @@ angular.module("explorer.message", [])
 	$scope.historic = [];
 	
 	$rootScope.$on('message.posted', function(event, message) {
-		var phase = $scope.$root.$$phase;
-		if(phase == '$apply' || phase == '$digest') {
+		$timeout(function() {
 			$scope.message = message;
-		} else {
-		   this.$apply(function() {
-				$scope.message = message;
-			});
-		}
-		
-		$timeout.cancel($scope.timeout);
-		$scope.timeout = $timeout(function() {
-			$scope.$apply(function() {
-				$scope.removeMessage();
-			});
-		}, $scope.persistDuration);
+			$timeout.cancel($scope.timeout);
+			$scope.timeout = $timeout(function() {
+				$scope.$apply(function() {
+					$scope.removeMessage();
+				});
+			}, $scope.persistDuration);
+		});
 	});
 	
 	$rootScope.$on("message.cleared", $scope.removeMessage);
