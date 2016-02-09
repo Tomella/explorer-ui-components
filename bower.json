@@ -1,6 +1,6 @@
 {
   "name": "explorer-ui-components",
-  "version": "0.0.3",
+  "version": "0.0.7",
   "description": "UI components to support Geoscience Australia Explorer like apps.",
   "main" : [
       "dist/ga-explorer-ui.js",
