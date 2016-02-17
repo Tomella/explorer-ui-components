@@ -1,0 +1,595 @@
+.exp-block {
+  margin-right: 0;
+  margin-left: 0;
+  color: #454545;
+  background-color: #fff;
+  border-color: #ddd;
+  border-radius: 4px 4px 0 0;
+  border-style: solid;
+  border-width: 1px;
+  box-sizing: content-box;
+  line-height: normal;
+  padding: 2px;
+  outline: 0 none;
+}
+
+.exp-header {
+  border-color: #ccc;
+  background-color: #fff;
+  color: #454545;
+  background-image: linear-gradient(to bottom, #fff 0%, #e0e0e0 100%);
+  background-repeat: repeat-x;
+}
+
+.exp-block .exp-header {
+  box-sizing: content-box;
+}
+
+.exp-block > .exp-header {
+  border-radius: 6px 6px 0 0;
+  margin: -2px 0 10px -2px;
+  padding: 0.3em 2px;
+  position: relative;
+  border-bottom-style: solid;
+  border-bottom-width: 1px;
+  font-size: 1.2em;
+  height: 1.1em;
+  min-height: 16px;
+  white-space: nowrap;
+  width: 100%;
+}
+
+.pad-right {
+  padding-right: 3px;
+}
+
+button.undecorated {
+  padding: 0;
+  border: none;
+  background: none;
+}
+@charset "utf-8";
+
+@media screen and (min-width: 480px) {
+  .breadcrumbs {
+    margin-top: 3px;
+  }
+}
+
+@media screen and (min-width: 768px) and (max-width: 960px) {
+  .breadcrumbs {
+    padding: 0;
+  }
+}
+
+a {
+  cursor: pointer;
+}
+
+#logo {
+  margin-left: 0;
+  padding-left: 0;
+}
+
+img.logo {
+  width: 180px;
+}
+
+img.logo-stacked {
+  width: 106px;
+}
+
+.breadcrumbs {
+  display: inline;
+  font-size: 0.7em;
+  list-style: none outside none;
+  padding: 0;
+  z-index: 10;
+}
+
+.breadcrumbsContainer {
+  margin-left: 184px;
+  position: absolute;
+  width: 100%;
+}
+
+.breadcrumbs li a,
+.breadcrumbs li.last {
+  background: url("data:image/gif;base64,R0lGODlhBQAJAJEAAP//wd///35aoP///yH/C1hNUCBEYXRhWE1QPD94cGFja2V0IGJlZ2luPSLvu78iIGlkPSJXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQiPz4gPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyIgeDp4bXB0az0iQWRvYmUgWE1QIENvcmUgNS4wLWMwNjAgNjEuMTM0Nzc3LCAyMDEwLzAyLzEyLTE3OjMyOjAwICAgICAgICAiPiA8cmRmOlJERiB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiPiA8cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0iIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtbG5zOnhtcE1NPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvbW0vIiB4bWxuczpzdFJlZj0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL3NUeXBlL1Jlc291cmNlUmVmIyIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ1M1IFdpbmRvd3MiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6QzJBOTA1NEZFMEE2MTFFM0JCMkQ5NUJEOTU5QUQ1RDQiIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6QzJBOTA1NTBFMEE2MTFFM0JCMkQ5NUJEOTU5QUQ1RDQiPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDpDMkE5MDU0REUwQTYxMUUzQkIyRDk1QkQ5NTlBRDVENCIgc3RSZWY6ZG9jdW1lbnRJRD0ieG1wLmRpZDpDMkE5MDU0RUUwQTYxMUUzQkIyRDk1QkQ5NTlBRDVENCIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/PgH//v38+/r5+Pf29fTz8vHw7+7t7Ovq6ejn5uXk4+Lh4N/e3dzb2tnY19bV1NPS0dDPzs3My8rJyMfGxcTDwsHAv769vLu6ubi3trW0s7KxsK+urayrqqmop6alpKOioaCfnp2cm5qZmJeWlZSTkpGQj46NjIuKiYiHhoWEg4KBgH9+fXx7enl4d3Z1dHNycXBvbm1sa2ppaGdmZWRjYmFgX15dXFtaWVhXVlVUU1JRUE9OTUxLSklIR0ZFRENCQUA/Pj08Ozo5ODc2NTQzMjEwLy4tLCsqKSgnJiUkIyIhIB8eHRwbGhkYFxYVFBMSERAPDg0MCwoJCAcGBQQDAgEAACH5BAAAAAAALAAAAAAFAAkAAAIMHBRjqJf7XGNwRlYAADs=") no-repeat scroll right center rgba(0, 0, 0, 0);
+  float: left;
+  padding-right: 0;
+}
+
+.breadcrumbs li a {
+  color: #006983;
+  padding: 0 10px;
+}
+
+.breadcrumbs li.first a {
+  padding-left: 0;
+  padding-right: 10px;
+}
+
+.breadcrumbs li.last,
+.breadcrumbs li.last a {
+  background: none repeat scroll 0 0 rgba(0, 0, 0, 0);
+  color: #5e6a71;
+}
+
+.navbar-right {
+  margin-top: 30px;
+}
+
+.appTitle {
+  color: #777;
+  font-weight: bold;
+  left: 0;
+  margin-left: 120px;
+  margin-top: 30px;
+  position: absolute;
+  top: 0;
+}
+
+.appTitle h1 {
+  font-size: medium;
+  font-weight: bold;
+  margin: 0;
+}
+
+.navbar-default .navbar-nav li a {
+  margin-top: 20px;
+  padding-left: 5px;
+  padding-right: 5px;
+  padding-top: 10px;
+}
+
+.navbar-default {
+  min-height: 70px;
+}
+
+.navbar-default .navbar-toggle {
+  margin-bottom: 17px;
+  margin-top: 18px;
+  z-index: 1;
+}
+
+.strap-blue,
+.strap-white,
+.strap-red {
+  height: 8px;
+  margin-bottom: 3px;
+}
+
+.strap-blue {
+  background-color: #72c7e7;
+  float: left;
+  width: 88%;
+}
+
+.strap-white {
+  background-color: #fff;
+  float: left;
+  width: 3px;
+}
+
+.strap-red {
+  background-color: #a33f1f;
+}
+.marsinfo {
+  z-index: 1010;
+  padding: 1px;
+  text-align: left;
+  white-space: normal;
+  opacity: 1;
+  background-color: #F4FABE;
+  background-clip: padding-box;
+  border: 1px solid #ccc;
+  border: 1px solid rgba(0, 0, 0, .2);
+  border-radius: 6px;
+  -webkit-box-shadow: 0 5px 10px rgba(0, 0, 0, .2);
+  box-shadow: 0 5px 10px rgba(0, 0, 0, .2);
+}
+
+.marsinfo-title {
+  padding: 8px 14px;
+  margin: 0;
+  font-size: 14px;
+  font-weight: normal;
+  line-height: 18px;
+  background-color: #FAF29D;
+  border-bottom: 1px solid #ebebeb;
+  border-radius: 5px 5px 0 0;
+}
+
+.marsinfo-content {
+  padding: 9px 14px;
+}
+
+.marsinfo.ng-hide-add,
+.marsinfo.ng-hide-remove {
+  /* this is required as of 1.3x to properly
+     apply all styling in a show/hide animation */
+  transition: 0s linear all;
+}
+
+.marsinfo.ng-hide-add-active,
+.marsinfo.ng-hide-remove-active {
+  /* the transition is defined in the active class */
+  transition: 1s linear all;
+}
+.knob rect {
+  fill: #72C7E7;
+}
+
+.knob g polygon {
+  opacity: 1;
+}
+
+.knob circle {
+  fill: #A33F1F;
+  stroke: #793057;
+  stroke-width: 2;
+  filter: url("knob/#knobshadow");
+}
+
+.knob text {
+  font-size: 10px;
+  fill: black;
+  font-family: sans-serif;
+  font-weight: 300;
+  -webkit-transition: all .1s ease-in-out;
+}
+
+.knob text.active {
+  font-size: 15px;
+  -webkit-transition: all .3s ease-in-out;
+}
+.exp-modal {
+  z-index: 1041;
+  padding: 1px;
+  text-align: left;
+  white-space: normal;
+  background-color: white;
+  background-clip: padding-box;
+  border: 1px solid #ccc;
+  border: 1px solid rgba(0, 0, 0, .2);
+  border-radius: 6px;
+  -webkit-box-shadow: 0 5px 10px rgba(0, 0, 0, .2);
+  box-shadow: 0 5px 10px rgba(0, 0, 0, .2);
+}
+
+.exp-modal-outer {
+  z-index: 1040;
+}
+
+.exp-modal-title {
+  padding: 4px 6px;
+  margin: 0;
+  font-size: 14px;
+  font-weight: normal;
+  line-height: 18px;
+  background-color: #eeeeee;
+  border-bottom: 1px solid #ebebeb;
+  border-radius: 5px 5px 0 0;
+}
+
+.exp-modal-close {
+  float: right;
+  border: none;
+  outline: none;
+  padding-right: 2px;
+}
+
+.exp-modal-content {
+  padding: 9px 14px;
+}
+
+.exp-modal.ng-hide-add,
+.exp-modal.ng-hide-remove {
+  /* this is required as of 1.3x to properly
+     apply all styling in a show/hide animation */
+  transition: 0s linear all;
+}
+
+.exp-modal.ng-hide-add-active,
+.exp-modal.ng-hide-remove-active {
+  /* the transition is defined in the active class */
+  transition: 1s linear all;
+}
+
+.exp-backdrop {
+  background-color: #000;
+  bottom: 0;
+  left: 0;
+  position: fixed;
+  right: 0;
+  top: 0;
+  z-index: -1;
+}
+
+.exp-backdrop.in {
+  opacity: 0.6;
+}
+.toggle-switch {
+  display: inline-block;
+  cursor: pointer;
+  border-radius: 4px;
+  border: 1px solid;
+  border-color: #cccccc;
+  position: relative;
+  text-align: left;
+  overflow: hidden;
+  line-height: 8px;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  vertical-align: middle;
+  min-width: 100px;
+  -webkit-transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+  transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+}
+
+.toggle-switch .knob {
+  color: #333333;
+  background: #ffffff;
+  border: 3px;
+}
+
+.toggle-switch .switch-left {
+  color: #fff;
+  background: #a34022;
+}
+
+.toggle-switch .switch-right {
+  color: #000;
+  background: #eeeeee;
+}
+
+.toggle-switch {
+  border: 1px solid;
+  cursor: pointer;
+  display: inline-block;
+  text-align: left;
+  overflow: hidden;
+  line-height: 8px;
+  min-width: 100px;
+}
+
+.toggle-switch.disabled > div > span.knob {
+  background: #AAA;
+}
+
+.toggle-switch span {
+  cursor: pointer;
+  display: inline-block;
+  float: left;
+  height: 100%;
+  line-height: 20px;
+  padding: 4px;
+  text-align: center;
+  width: 33%;
+  white-space: nowrap;
+  box-sizing: border-box;
+  -o-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+}
+
+.toggle-switch > div {
+  position: relative;
+  width: 150%;
+}
+
+.toggle-switch .knob {
+  background: red;
+  border-left: 1px solid #ccc;
+  border-right: 1px solid #ccc;
+  background-color: #f5f5f5;
+  width: 34%;
+  z-index: 100;
+}
+
+.toggle-switch .switch-on {
+  left: 0%;
+}
+
+.toggle-switch .switch-off {
+  left: -50%;
+}
+
+.toggle-switch .switch-left,
+.toggle-switch .switch-right {
+  z-index: 1;
+}
+
+.toggle-switch .switch-left {
+  color: #fff;
+  background: #a34022;
+}
+
+.toggle-switch .switch-right {
+  color: #333;
+  background: #f0f0f0;
+}
+
+.toggle-switch-animate {
+  transition: left 0.5s;
+  -o-transition: left 0.5s;
+  -moz-transition: left 0.5s;
+  -webkit-transition: left 0.5s;
+}
+.tabs-main {
+  position: absolute;
+  top: 0px;
+  bottom: 0px;
+  padding-top: 8px;
+  right: 0px;
+  background: #FFF;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -o-user-select: none;
+  user-select: none;
+}
+
+#tabs-container {
+  position: absolute;
+  width: 9999px;
+  z-index: inherit;
+  /* keeps ie happy for mousemove events */
+  background: rgba(255, 255, 255, 0);
+}
+
+.rotate-tabs {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 100%;
+  -webkit-transform: rotate(-90deg);
+  -moz-transform: rotate(-90deg);
+  -o-transform: rotate(-90deg);
+  -ms-transform: rotate(-90deg);
+  -sand-transform: rotate(90deg);
+  transform-origin: bottom right;
+  -webkit-transform-origin: bottom right;
+  -ms-transform-origin: bottom right;
+  display: block;
+}
+
+.tab-item {
+  float: right;
+  padding: 5px 15px 0px 15px;
+  border: 1px solid #999;
+  background: #FFF;
+  cursor: pointer;
+  height: 30px;
+}
+
+#tabs-content-container {
+  width: 550px;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  position: absolute;
+  z-index: inherit;
+}
+
+#tabs-content-container .tab-content-item {
+  background: #FFF;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.x-resize {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  width: 4px;
+  bottom: 0px;
+  cursor: e-resize;
+  background: #CCC;
+  z-index: 1;
+}
+
+/* bg-splitter override look & feel */
+
+.split-panes.vertical > .split-handler {
+  background: #CCC !important;
+  border: none !important;
+}
+
+.split-panes.vertical > .split-handler:hover,
+.h-resize:hover {
+  background: #999 !important;
+}
+
+.split-panes {
+  background: #FFF;
+}
+.tabs-left-main {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  background: #FFF;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -o-user-select: none;
+  user-select: none;
+}
+
+#tabs-left-container {
+  position: absolute;
+  z-index: inherit;
+  /* keeps ie happy for mousemove events */
+  background: rgba(255, 255, 255, 0);
+  top: 150px;
+}
+
+.rotate-tabs-left {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 100%;
+  -webkit-transform: rotate(-90deg);
+  -moz-transform: rotate(-90deg);
+  -o-transform: rotate(-90deg);
+  -ms-transform: rotate(-90deg);
+  -sand-transform: rotate(90deg);
+  transform-origin: top left;
+  -webkit-transform-origin: top left;
+  -ms-transform-origin: top left;
+  display: block;
+}
+
+.tab-left-item {
+  float: right;
+  padding: 5px 15px 0px 15px;
+  border: 1px solid #999;
+  background: #FFF;
+  cursor: pointer;
+  height: 30px;
+}
+
+#tabs-left-content-container {
+  width: 700px;
+  float: left;
+  height: 599px;
+  position: inherit;
+  z-index: inherit;
+  overflow-y: auto;
+}
+
+#tabs-left-content-container .tab-left-content-item {
+  background: #FFF;
+  height: 100%;
+}
+
+.x-left-resize {
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  width: 4px;
+  height: 100%;
+  cursor: e-resize;
+  background: #CCC;
+  z-index: 2;
+}
+
+/* bg-splitter override look & feel */
+
+.split-panes.vertical > .split-handler {
+  background: #CCC !important;
+  border: none !important;
+}
+
+.split-panes.vertical > .split-handler:hover,
+.h-resize:hover {
+  background: #999 !important;
+}
+
+.split-panes {
+  background: #FFF;
+}
