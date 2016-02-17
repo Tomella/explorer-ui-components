@@ -11,11 +11,15 @@ angular.module("explorer.legend", [])
 	return {
 		scope : {
 			legend : "=",
-			heading:"=?"
+			heading : "=?",
+			newwindow : "=?"
 		},
 		controller : ['$scope', function($scope) {
 			if(!$scope.heading) {
 				$scope.heading = "Legend";
+			}
+			if(!$scope.newwindow) {
+				$scope.newwindow = false;
 			}
 			$scope.showing = false;
 		}],
@@ -29,18 +33,22 @@ angular.module("explorer.legend", [])
 				modalInstance = $modal.open({
 					templateUrl: 'components/legend/legend.html',
 					windowClass: 'legendContainer',
-					size:'sm',
-					controller : ['$scope', '$modalInstance', 'legend', 'heading', function($scope, $modalInstance, legend, heading) {
+					size: 'sm',
+					controller : ['$scope','$modalInstance', 'legend', 'heading','newwindow', function($scope, $modalInstance, legend, heading, newwindow) {
 						$scope.legend = legend;
 						$scope.heading = heading;
+						$scope.newwindow = newwindow;
 					}],
-					backdrop:false,
-					resolve: {
-						legend: function () {
+					backdrop : false,
+					resolve : {
+						legend : function() {
 							return scope.legend;
 						},
 						heading : function() {
 							return scope.heading;
+						},
+						newwindow : function() {
+							return scope.newwindow;
 						}
 					}
 				});

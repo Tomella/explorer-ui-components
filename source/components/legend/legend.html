@@ -1,8 +1,12 @@
 <div>    
+
     <div class="modal-header" drag-parent parentClass="legendContainer">
         <h4 class="modal-title">{{heading}}</h4>
     </div>
-	<div class="legendImageContainer" style="max-height:450px;overflow-y:auto; overflow-x:hidden;padding-bottom:5px"> 
-		<img ng-src="{{legend}}"></img>
+
+	<div class="legendImageContainer" style="max-height:450px;overflow-y:auto; overflow-x:auto;padding-left:1px;padding-bottom:5px">
+		<img ng-if="(newwindow == false)" ng-src="{{legend}}" />
+		<a style="text-decoration:none" ng-if="newwindow" href="{{legend}}" target="_blank">Click here to display legend in a new window</a>
 	</div>
+
 </div>
