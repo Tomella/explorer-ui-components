@@ -205,4 +205,4 @@ angular.module("explorer.persist", ['explorer.projects'])
 	};
 }]);
 
-})(angular, indexedDB || mozIndexedDB || webkitIndexedDB || msIndexedDB, localStorage, sessionStorage);
+})(angular, window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB, localStorage, sessionStorage);
