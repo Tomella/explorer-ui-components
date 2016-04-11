@@ -887,7 +887,7 @@ angular.module("graph", [])
 			};
 			
 			scope.mouseMove = function(event) {
-				calculatePosition(event);
+				if (scope.data) calculatePosition(event);
 				event.position = scope.position;
 				if(scope.move) {
 					scope.move({event:event});
