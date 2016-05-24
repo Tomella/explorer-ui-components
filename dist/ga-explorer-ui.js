@@ -1260,10 +1260,14 @@ angular.module("explorer.height.delta", [])
             this.$get = ['$http', '$q', function ($http, $q) {
                 return {
                     baseUrlForPkg: function(pkg) {
-                        var regexp = new RegExp('((?:.*\/)|^)' + pkg + '[\w-]*\.js(?:\W|$)', 'i');
+                        var regexp1 = new RegExp('((?:.*\/)|^)' + pkg + '[\w-]*\.js(?:\W|$)', 'i');
+                        var regexp2 = new RegExp('((?:.*\/)|^)' + pkg + '\.min[\w-]*\.js(?:\W|$)', 'i');
                         var scripts = document.getElementsByTagName('script');
                         for ( var i = 0, len = scripts.length; i < len; ++i) {
-                            var result = regexp.exec(scripts[i].getAttribute('src'));
+                            var result, src = scripts[i].getAttribute('src');
+                            result = regexp1.exec(src);
+                            if (result !== null) return result[1];
+                            result = regexp2.exec(src);
                             if (result !== null) return result[1];
                         }
                     },
