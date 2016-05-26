@@ -265,6 +265,46 @@ angular.module("explorer.asynch", [])
 	
 'use strict';
 
+angular.module("explorer.broker", [])
+
+.factory("brokerService", ['$log', function($log) {
+	var listeners = {};
+	
+	return {
+		register : function(name, handler) {
+			if(!(name in listeners)) {
+				listeners[name] = {};
+			}
+			listeners[name][handler] = handler;
+		},
+		
+		deregister : function(name, handler) {
+			if(name in listeners && handler in listeners[name]) {
+				delete listeners[name][handler];
+			}
+		},
+		
+		route : function(message) {
+			if(message.jobName && listeners[message.jobName]) {
+				angular.forEach(listeners[message.jobName], function(handler) {
+					handler.process(message);
+				});
+			} else {
+				$log.debug("No handler found for " + message.jobName);
+			}
+		}
+	};
+}]);
+
+})(angular);
+/*!
+ * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
+ */
+
+(function(angular) {
+	
+'use strict';
+
 angular.module("explorer.config", ['explorer.httpdata', 'explorer.waiting'])
 
 .provider("configService", function ConfigServiceProvider() {
@@ -347,46 +387,6 @@ angular.module("explorer.config", ['explorer.httpdata', 'explorer.waiting'])
 		return $config;		
 	}];
 });
-
-})(angular);
-/*!
- * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
- */
-
-(function(angular) {
-	
-'use strict';
-
-angular.module("explorer.broker", [])
-
-.factory("brokerService", ['$log', function($log) {
-	var listeners = {};
-	
-	return {
-		register : function(name, handler) {
-			if(!(name in listeners)) {
-				listeners[name] = {};
-			}
-			listeners[name][handler] = handler;
-		},
-		
-		deregister : function(name, handler) {
-			if(name in listeners && handler in listeners[name]) {
-				delete listeners[name][handler];
-			}
-		},
-		
-		route : function(message) {
-			if(message.jobName && listeners[message.jobName]) {
-				angular.forEach(listeners[message.jobName], function(handler) {
-					handler.process(message);
-				});
-			} else {
-				$log.debug("No handler found for " + message.jobName);
-			}
-		}
-	};
-}]);
 
 })(angular);
 /*!
@@ -641,31 +641,6 @@ angular.module('explorer.feature.indicator', ['explorer.projects'])
  */
 
 (function(angular) {
-	
-'use.strict';
-
-angular.module("explorer.focusme", [])
-
-.directive("focusMe", ['$log', '$timeout', function($log, $timeout){
-	return {
-		link: function(scope, element, attrs) {
-            attrs.$observe("focusMe", function(newValue) {
-                if (newValue === "true") {
-                    $timeout(function(){
-                    	element.focus();
-                    });
-                }
-            });
-		}
-	};
-}]);
-
-})(angular);
-/*!
- * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
- */
-
-(function(angular) {
 
 'use strict';
 
@@ -730,6 +705,31 @@ angular.module("explorer.flasher", [])
 		templateUrl: "components/flasher/flash.html",
 		link : function(scope, element, attrs){
 			element.addClass("marsFlash");
+		}
+	};
+}]);
+
+})(angular);
+/*!
+ * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
+ */
+
+(function(angular) {
+	
+'use.strict';
+
+angular.module("explorer.focusme", [])
+
+.directive("focusMe", ['$log', '$timeout', function($log, $timeout){
+	return {
+		link: function(scope, element, attrs) {
+            attrs.$observe("focusMe", function(newValue) {
+                if (newValue === "true") {
+                    $timeout(function(){
+                    	element.focus();
+                    });
+                }
+            });
 		}
 	};
 }]);
@@ -2078,7 +2078,6 @@ angular.module("explorer.persist", ['explorer.projects'])
 		  		store = "Store", 
 		  		waiters = [];
 		  
-		  
         if (indexedDB) {
             var request = indexedDB.open("GAExplorer." + prefix);
             request.onupgradeneeded = function() {
@@ -2086,17 +2085,23 @@ angular.module("explorer.persist", ['explorer.projects'])
             };
             request.onsuccess = function() {
                 db = request.result;
-					 if(waiters.length) {
-						waiters.forEach(function(waiter) { 
-							waiter.resolve(db);
-						});
-					 }
+					 notifyWaiters();
             };
             request.onerror = function() {
                 db = 0;
+					 notifyWaiters();
             };
         } else {
+			  // Don't need a notify as it runs sysnchronously to here.
 			  db = 0;
+		  }
+
+		  function notifyWaiters() {
+				if(waiters) {
+					waiters.forEach(function(waiter) { 
+						waiter.resolve(db);
+					});
+				}
 		  }
 
 		  function doGetDb() {
@@ -2298,50 +2303,6 @@ angular.module('mars.print', [])
 }]);
 
 })(angular, window);
-/*!
- * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
- */
-(function(angular) {
-
-	
-'use strict';
-
-angular.module("explorer.projects", [])
-
-.provider('projectsService', function ProjectsServiceProvider() { 
-	var currentProject = "<NONE>";
-
-	this.$get =  ['$q', '$timeout', 'httpData', function ($q, $timeout, httpData) {
-		var baseUrl = 'service/appConfig/projects?t=';
-	
-		return {
-			getCurrentProject : function() {
-				return $q.when(currentProject);
-			},
-		
-			getProjects : function() {
-				var deferred = $q.defer();
-				if(this.projects) {				
-					$timeout((function() {
-						deferred.resolve(this.projects);
-					}).bind(this));
-				}
-                httpData.get(baseUrl + (new Date()).getTime()).then((function(response) {
-					deferred.resolve(this.projects = response && response.data);
-				}).bind(this));
-			
-				return deferred.promise;
-			}
-		};
-	}];
-	
-	this.setProject = function(project) {
-		currentProject = project;
-	};
-});
-
-
-})(angular);
 /**
  * @ngdoc object
  * @name explorer.resizelistener
@@ -2386,6 +2347,50 @@ angular.module('explorer.resizelistener', [])
         });
     };
 });
+/*!
+ * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
+ */
+(function(angular) {
+
+	
+'use strict';
+
+angular.module("explorer.projects", [])
+
+.provider('projectsService', function ProjectsServiceProvider() { 
+	var currentProject = "<NONE>";
+
+	this.$get =  ['$q', '$timeout', 'httpData', function ($q, $timeout, httpData) {
+		var baseUrl = 'service/appConfig/projects?t=';
+	
+		return {
+			getCurrentProject : function() {
+				return $q.when(currentProject);
+			},
+		
+			getProjects : function() {
+				var deferred = $q.defer();
+				if(this.projects) {				
+					$timeout((function() {
+						deferred.resolve(this.projects);
+					}).bind(this));
+				}
+                httpData.get(baseUrl + (new Date()).getTime()).then((function(response) {
+					deferred.resolve(this.projects = response && response.data);
+				}).bind(this));
+			
+				return deferred.promise;
+			}
+		};
+	}];
+	
+	this.setProject = function(project) {
+		currentProject = project;
+	};
+});
+
+
+})(angular);
 /*!
  * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
  */
@@ -2661,6 +2666,38 @@ angular.module('explorer.tabs', [])
 }]);
 
 })(angular);
+/*!
+ * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
+ */
+(function(angular) {
+
+'use strict';
+
+angular.module('explorer.toolbar', [])
+
+.directive('expToolbar', [function() {
+	return {
+		restrict:'AE',
+		scope:true,
+		controller : ['$scope', function($scope) {
+			$scope.item = "";	
+			$scope.parameters = {};
+			
+			$scope.toggleItem = function(item) {
+				$scope.item = $scope.item == item?"":item;
+			};
+			
+			this.toggleItem = function(item) {
+				$scope.item = $scope.item == item?"":item;
+			};
+			this.currentItem = function() {
+				return $scope.item;
+			};
+		}]
+	};
+}]);
+
+})(angular);
 /**
  * @ngdoc object
  * @name explorer.tabs.left
@@ -2741,38 +2778,6 @@ angular.module('explorer.tabs.left', [])
 	};
 	
 }]);
-/*!
- * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
- */
-(function(angular) {
-
-'use strict';
-
-angular.module('explorer.toolbar', [])
-
-.directive('expToolbar', [function() {
-	return {
-		restrict:'AE',
-		scope:true,
-		controller : ['$scope', function($scope) {
-			$scope.item = "";	
-			$scope.parameters = {};
-			
-			$scope.toggleItem = function(item) {
-				$scope.item = $scope.item == item?"":item;
-			};
-			
-			this.toggleItem = function(item) {
-				$scope.item = $scope.item == item?"":item;
-			};
-			this.currentItem = function() {
-				return $scope.item;
-			};
-		}]
-	};
-}]);
-
-})(angular);
 /*!
  * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
  */

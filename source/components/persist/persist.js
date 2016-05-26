@@ -133,7 +133,6 @@ angular.module("explorer.persist", ['explorer.projects'])
 		  		store = "Store", 
 		  		waiters = [];
 		  
-		  
         if (indexedDB) {
             var request = indexedDB.open("GAExplorer." + prefix);
             request.onupgradeneeded = function() {
@@ -141,17 +140,23 @@ angular.module("explorer.persist", ['explorer.projects'])
             };
             request.onsuccess = function() {
                 db = request.result;
-					 if(waiters.length) {
-						waiters.forEach(function(waiter) { 
-							waiter.resolve(db);
-						});
-					 }
+					 notifyWaiters();
             };
             request.onerror = function() {
                 db = 0;
+					 notifyWaiters();
             };
         } else {
+			  // Don't need a notify as it runs sysnchronously to here.
 			  db = 0;
+		  }
+
+		  function notifyWaiters() {
+				if(waiters) {
+					waiters.forEach(function(waiter) { 
+						waiter.resolve(db);
+					});
+				}
 		  }
 
 		  function doGetDb() {
