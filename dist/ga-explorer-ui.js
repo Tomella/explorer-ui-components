@@ -265,46 +265,6 @@ angular.module("explorer.asynch", [])
 	
 'use strict';
 
-angular.module("explorer.broker", [])
-
-.factory("brokerService", ['$log', function($log) {
-	var listeners = {};
-	
-	return {
-		register : function(name, handler) {
-			if(!(name in listeners)) {
-				listeners[name] = {};
-			}
-			listeners[name][handler] = handler;
-		},
-		
-		deregister : function(name, handler) {
-			if(name in listeners && handler in listeners[name]) {
-				delete listeners[name][handler];
-			}
-		},
-		
-		route : function(message) {
-			if(message.jobName && listeners[message.jobName]) {
-				angular.forEach(listeners[message.jobName], function(handler) {
-					handler.process(message);
-				});
-			} else {
-				$log.debug("No handler found for " + message.jobName);
-			}
-		}
-	};
-}]);
-
-})(angular);
-/*!
- * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
- */
-
-(function(angular) {
-	
-'use strict';
-
 angular.module("explorer.config", ['explorer.httpdata', 'explorer.waiting'])
 
 .provider("configService", function ConfigServiceProvider() {
@@ -387,6 +347,46 @@ angular.module("explorer.config", ['explorer.httpdata', 'explorer.waiting'])
 		return $config;		
 	}];
 });
+
+})(angular);
+/*!
+ * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
+ */
+
+(function(angular) {
+	
+'use strict';
+
+angular.module("explorer.broker", [])
+
+.factory("brokerService", ['$log', function($log) {
+	var listeners = {};
+	
+	return {
+		register : function(name, handler) {
+			if(!(name in listeners)) {
+				listeners[name] = {};
+			}
+			listeners[name][handler] = handler;
+		},
+		
+		deregister : function(name, handler) {
+			if(name in listeners && handler in listeners[name]) {
+				delete listeners[name][handler];
+			}
+		},
+		
+		route : function(message) {
+			if(message.jobName && listeners[message.jobName]) {
+				angular.forEach(listeners[message.jobName], function(handler) {
+					handler.process(message);
+				});
+			} else {
+				$log.debug("No handler found for " + message.jobName);
+			}
+		}
+	};
+}]);
 
 })(angular);
 /*!
@@ -641,6 +641,31 @@ angular.module('explorer.feature.indicator', ['explorer.projects'])
  */
 
 (function(angular) {
+	
+'use.strict';
+
+angular.module("explorer.focusme", [])
+
+.directive("focusMe", ['$log', '$timeout', function($log, $timeout){
+	return {
+		link: function(scope, element, attrs) {
+            attrs.$observe("focusMe", function(newValue) {
+                if (newValue === "true") {
+                    $timeout(function(){
+                    	element.focus();
+                    });
+                }
+            });
+		}
+	};
+}]);
+
+})(angular);
+/*!
+ * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
+ */
+
+(function(angular) {
 
 'use strict';
 
@@ -705,31 +730,6 @@ angular.module("explorer.flasher", [])
 		templateUrl: "components/flasher/flash.html",
 		link : function(scope, element, attrs){
 			element.addClass("marsFlash");
-		}
-	};
-}]);
-
-})(angular);
-/*!
- * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
- */
-
-(function(angular) {
-	
-'use.strict';
-
-angular.module("explorer.focusme", [])
-
-.directive("focusMe", ['$log', '$timeout', function($log, $timeout){
-	return {
-		link: function(scope, element, attrs) {
-            attrs.$observe("focusMe", function(newValue) {
-                if (newValue === "true") {
-                    $timeout(function(){
-                    	element.focus();
-                    });
-                }
-            });
 		}
 	};
 }]);
@@ -2074,7 +2074,11 @@ angular.module("explorer.persist", ['explorer.projects'])
 }])
 
 .factory("persistLocalService", ['$log', '$q', 'projectsService', function($log, $q, projectsService) {
-        var db, store = "Store";
+        var db = -1, 
+		  		store = "Store", 
+		  		waiters = [];
+		  
+		  
         if (indexedDB) {
             var request = indexedDB.open("GAExplorer." + prefix);
             request.onupgradeneeded = function() {
@@ -2082,32 +2086,58 @@ angular.module("explorer.persist", ['explorer.projects'])
             };
             request.onsuccess = function() {
                 db = request.result;
+					 if(waiters.length) {
+						waiters.forEach(function(waiter) { 
+							waiter.resolve(db);
+						});
+					 }
             };
-        }
+            request.onerror = function() {
+                db = 0;
+            };
+        } else {
+			  db = 0;
+		  }
+
+		  function doGetDb() {
+			  var deferred;
+			  if(db == -1) {
+				  deferred = $q.defer();
+				  waiters.push(deferred);
+				  return deferred.promise;
+			  }
+			  return $q.when(db);
+		  }
 
         function doGetItem(project, key) {
-            key = project + "." + key;
-            $log.debug("Fetching state locally for key " + key);
-            if (!db) {
-                var item = localStorage.getItem(prefix + "." + key);
-                if (item) {
-                    try {
+			  return doGetDb().then(function(db) {
+				  return processGetItem(db);
+			  });
+			  
+			  function processGetItem(db) {
+            	key = project + "." + key;
+            	$log.debug("Fetching state locally for key " + key);
+            	if (!db) {
+                	var item = localStorage.getItem(prefix + "." + key);
+                	if (item) {
+                   	try {
                         item = JSON.parse(item);
-                    } catch (e) {
+                    	} catch (e) {
                         // Do nothing as it will be a string
-                    }
-                }
-                return $q.when(item);
-            }
+                    	}
+                	}
+                	return $q.when(item);
+            	}
 
-            var req = db.transaction(store).objectStore(store).get(key), deferred = $q.defer();
-            req.onsuccess = function() {
-                deferred.resolve(req.result);
-            };
-            req.onerror = function() {
-                deferred.resolve(null);
-            };
-            return deferred.promise;
+            	var req = db.transaction(store).objectStore(store).get(key), deferred = $q.defer();
+            	req.onsuccess = function() {
+               	deferred.resolve(req.result);
+            	};
+            	req.onerror = function() {
+                	deferred.resolve(null);
+            	};
+            	return deferred.promise;
+			  }
         }
 
         function doSetItem(project, key, value) {

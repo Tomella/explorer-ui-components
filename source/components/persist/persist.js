@@ -129,7 +129,11 @@ angular.module("explorer.persist", ['explorer.projects'])
 }])
 
 .factory("persistLocalService", ['$log', '$q', 'projectsService', function($log, $q, projectsService) {
-        var db, store = "Store";
+        var db = -1, 
+		  		store = "Store", 
+		  		waiters = [];
+		  
+		  
         if (indexedDB) {
             var request = indexedDB.open("GAExplorer." + prefix);
             request.onupgradeneeded = function() {
@@ -137,32 +141,58 @@ angular.module("explorer.persist", ['explorer.projects'])
             };
             request.onsuccess = function() {
                 db = request.result;
+					 if(waiters.length) {
+						waiters.forEach(function(waiter) { 
+							waiter.resolve(db);
+						});
+					 }
             };
-        }
+            request.onerror = function() {
+                db = 0;
+            };
+        } else {
+			  db = 0;
+		  }
+
+		  function doGetDb() {
+			  var deferred;
+			  if(db == -1) {
+				  deferred = $q.defer();
+				  waiters.push(deferred);
+				  return deferred.promise;
+			  }
+			  return $q.when(db);
+		  }
 
         function doGetItem(project, key) {
-            key = project + "." + key;
-            $log.debug("Fetching state locally for key " + key);
-            if (!db) {
-                var item = localStorage.getItem(prefix + "." + key);
-                if (item) {
-                    try {
+			  return doGetDb().then(function(db) {
+				  return processGetItem(db);
+			  });
+			  
+			  function processGetItem(db) {
+            	key = project + "." + key;
+            	$log.debug("Fetching state locally for key " + key);
+            	if (!db) {
+                	var item = localStorage.getItem(prefix + "." + key);
+                	if (item) {
+                   	try {
                         item = JSON.parse(item);
-                    } catch (e) {
+                    	} catch (e) {
                         // Do nothing as it will be a string
-                    }
-                }
-                return $q.when(item);
-            }
+                    	}
+                	}
+                	return $q.when(item);
+            	}
 
-            var req = db.transaction(store).objectStore(store).get(key), deferred = $q.defer();
-            req.onsuccess = function() {
-                deferred.resolve(req.result);
-            };
-            req.onerror = function() {
-                deferred.resolve(null);
-            };
-            return deferred.promise;
+            	var req = db.transaction(store).objectStore(store).get(key), deferred = $q.defer();
+            	req.onsuccess = function() {
+               	deferred.resolve(req.result);
+            	};
+            	req.onerror = function() {
+                	deferred.resolve(null);
+            	};
+            	return deferred.promise;
+			  }
         }
 
         function doSetItem(project, key, value) {
