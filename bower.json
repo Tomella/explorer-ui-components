@@ -11,12 +11,11 @@
   ],
   "repository" : {
   	"type" : "git",
-  	"url" : "git://github.com/GeoscienceAustralia/explorer-ui-components.git"
+  	"url" : "https://bitbucket.org/geoscienceaustralia/explorer-ui-components.git"
   },
   "authors": [
     "Geoscience Australia"
   ],
-  "license": "https://raw.githubusercontent.com/GeoscienceAustralia/explorer-ui-components/master/LICENCE",
   "private": true,
   "ignore": [
     "**/.*",

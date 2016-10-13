@@ -302,6 +302,76 @@ angular.module("explorer.broker", [])
  */
 
 (function(angular) {
+'use strict';
+
+angular.module("explorer.confirm", ['ui.bootstrap', 'explorer.focusme'])
+
+.directive("expConfirm", ['confirmService', function(confirmService) {
+	return {
+		scope : {
+			success : "&",
+			cancel : "&",
+			expConfirm : "="
+		},
+		link : function(scope, element) {			
+			element.on("click", function(event) {
+				confirmService.confirm(scope);
+			});
+		}
+	};	
+}])
+
+.factory("confirmService", ['$log', '$modal', function($log, $modal) {
+	return {
+		confirm : function(details) {
+			var modalInstance;
+
+			details.confirmed = false;
+			modalInstance = $modal.open({
+				templateUrl: 'components/confirm/confirm.html',
+				size: "sm",
+				backdrop : "static",
+				keyboard : false,
+				controller : ['$scope', '$modalInstance', 'message', function ($scope, $modalInstance, message) {
+					$scope.message = message;
+
+					$scope.accept = function () {
+					   $modalInstance.close(true);
+					};
+					  
+					$scope.reject = function () {
+					   $modalInstance.close(false);
+					};
+				}],
+				resolve: {
+					message : function() {
+						return details.expConfirm;
+					}
+				}
+			}); 
+
+			modalInstance.opened.then(function() {
+				// Maybe do something about the focus here
+			});
+			
+		    modalInstance.result.then(function (confirmed) {
+		    	$log.info("Confirmed : " + confirmed);
+		        if(confirmed) {
+		        	details.success();
+		        } else if(details.cancel){
+		        	details.cancel();
+		        }
+		    });
+		}
+	};
+}]);
+
+})(angular);
+/*!
+ * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
+ */
+
+(function(angular) {
 	
 'use strict';
 
@@ -387,76 +457,6 @@ angular.module("explorer.config", ['explorer.httpdata', 'explorer.waiting'])
 		return $config;		
 	}];
 });
-
-})(angular);
-/*!
- * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
- */
-
-(function(angular) {
-'use strict';
-
-angular.module("explorer.confirm", ['ui.bootstrap', 'explorer.focusme'])
-
-.directive("expConfirm", ['confirmService', function(confirmService) {
-	return {
-		scope : {
-			success : "&",
-			cancel : "&",
-			expConfirm : "="
-		},
-		link : function(scope, element) {			
-			element.on("click", function(event) {
-				confirmService.confirm(scope);
-			});
-		}
-	};	
-}])
-
-.factory("confirmService", ['$log', '$modal', function($log, $modal) {
-	return {
-		confirm : function(details) {
-			var modalInstance;
-
-			details.confirmed = false;
-			modalInstance = $modal.open({
-				templateUrl: 'components/confirm/confirm.html',
-				size: "sm",
-				backdrop : "static",
-				keyboard : false,
-				controller : ['$scope', '$modalInstance', 'message', function ($scope, $modalInstance, message) {
-					$scope.message = message;
-
-					$scope.accept = function () {
-					   $modalInstance.close(true);
-					};
-					  
-					$scope.reject = function () {
-					   $modalInstance.close(false);
-					};
-				}],
-				resolve: {
-					message : function() {
-						return details.expConfirm;
-					}
-				}
-			}); 
-
-			modalInstance.opened.then(function() {
-				// Maybe do something about the focus here
-			});
-			
-		    modalInstance.result.then(function (confirmed) {
-		    	$log.info("Confirmed : " + confirmed);
-		        if(confirmed) {
-		        	details.success();
-		        } else if(details.cancel){
-		        	details.cancel();
-		        }
-		    });
-		}
-	};
-}]);
 
 })(angular);
 /*!
@@ -2303,50 +2303,6 @@ angular.module('mars.print', [])
 }]);
 
 })(angular, window);
-/**
- * @ngdoc object
- * @name explorer.resizelistener
- * @description
- * 
- * <p>Binds to window resize event, exposes windowWidth and windowHeight as $scope vars.</p>
- * 
- * 
- **/
-
-angular.module('explorer.resizelistener', [])
-
-.directive('resizeListener', function($window) {
-	
-	return function (scope, element) {
-        var w = angular.element($window);
-        scope.getWindowDimensions = function () {
-            return {
-                'h': w.height(),
-                'w': w.width()
-            };
-        };
-        
-        scope.$watch(scope.getWindowDimensions, function (newValue, oldValue) {
-            
-        	scope.windowHeight = newValue.h;
-            scope.windowWidth = newValue.w;
-
-            scope.style = function () {
-                return {
-                    'height': (newValue.h - 100) + 'px',
-                    'width': (newValue.w - 100) + 'px'
-                };
-            };
-            
-            // could also broadcast 'resize complete' event if needed..
-
-        }, true);
-
-        w.bind('resize', function () {
-            scope.$apply();
-        });
-    };
-});
 /*!
  * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
  */
@@ -2522,6 +2478,50 @@ angular.module("nedf.splash", ['explorer.projects'])
 }]);
 
 })(angular, sessionStorage);
+/**
+ * @ngdoc object
+ * @name explorer.resizelistener
+ * @description
+ * 
+ * <p>Binds to window resize event, exposes windowWidth and windowHeight as $scope vars.</p>
+ * 
+ * 
+ **/
+
+angular.module('explorer.resizelistener', [])
+
+.directive('resizeListener', function($window) {
+	
+	return function (scope, element) {
+        var w = angular.element($window);
+        scope.getWindowDimensions = function () {
+            return {
+                'h': w.height(),
+                'w': w.width()
+            };
+        };
+        
+        scope.$watch(scope.getWindowDimensions, function (newValue, oldValue) {
+            
+        	scope.windowHeight = newValue.h;
+            scope.windowWidth = newValue.w;
+
+            scope.style = function () {
+                return {
+                    'height': (newValue.h - 100) + 'px',
+                    'width': (newValue.w - 100) + 'px'
+                };
+            };
+            
+            // could also broadcast 'resize complete' event if needed..
+
+        }, true);
+
+        w.bind('resize', function () {
+            scope.$apply();
+        });
+    };
+});
 /*!
  * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
  */
@@ -2666,38 +2666,6 @@ angular.module('explorer.tabs', [])
 }]);
 
 })(angular);
-/*!
- * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
- */
-(function(angular) {
-
-'use strict';
-
-angular.module('explorer.toolbar', [])
-
-.directive('expToolbar', [function() {
-	return {
-		restrict:'AE',
-		scope:true,
-		controller : ['$scope', function($scope) {
-			$scope.item = "";	
-			$scope.parameters = {};
-			
-			$scope.toggleItem = function(item) {
-				$scope.item = $scope.item == item?"":item;
-			};
-			
-			this.toggleItem = function(item) {
-				$scope.item = $scope.item == item?"":item;
-			};
-			this.currentItem = function() {
-				return $scope.item;
-			};
-		}]
-	};
-}]);
-
-})(angular);
 /**
  * @ngdoc object
  * @name explorer.tabs.left
@@ -2778,6 +2746,38 @@ angular.module('explorer.tabs.left', [])
 	};
 	
 }]);
+/*!
+ * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
+ */
+(function(angular) {
+
+'use strict';
+
+angular.module('explorer.toolbar', [])
+
+.directive('expToolbar', [function() {
+	return {
+		restrict:'AE',
+		scope:true,
+		controller : ['$scope', function($scope) {
+			$scope.item = "";	
+			$scope.parameters = {};
+			
+			$scope.toggleItem = function(item) {
+				$scope.item = $scope.item == item?"":item;
+			};
+			
+			this.toggleItem = function(item) {
+				$scope.item = $scope.item == item?"":item;
+			};
+			this.currentItem = function() {
+				return $scope.item;
+			};
+		}]
+	};
+}]);
+
+})(angular);
 /*!
  * Copyright 2015 Geoscience Australia (http://www.ga.gov.au/copyright.html)
  */
